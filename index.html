@@ -106,7 +106,11 @@ tr.tot td{font-weight:600;background:var(--sunk)}
 .delta{font-family:var(--mono);font-size:13px;padding:3px 9px;border-radius:5px;border:1px solid var(--line);background:var(--sunk)}
 .delta.up{color:var(--good)} .delta.down{color:var(--bad)}
 .tier{font-size:44px;line-height:1}
-.t-대박{color:var(--gold)} .t-성공{color:var(--good)} .t-보통{color:var(--muted)} .t-실패{color:var(--bad)}
+.t-대박,.t-영웅{color:var(--gold)}
+.best.gn{color:var(--sns-dc);border-color:var(--sns-dc)}
+.jno{font-family:var(--display);color:var(--clay);margin-right:10px;font-size:.9em}
+.numset{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.numset input{width:84px} .t-성공{color:var(--good)} .t-보통{color:var(--muted)} .t-실패{color:var(--bad)}
 .vol{font-size:11.5px!important;font-weight:700;margin-top:2px}
 .v-안정{color:var(--good)!important} .v-보통{color:var(--muted)!important} .v-도박{color:var(--clay)!important}
 .odds{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px}
@@ -290,54 +294,67 @@ const FR_LINE=90;
 function josa(w,a,b){const c=w.charCodeAt(w.length-1)-0xAC00;if(c<0||c>11171)return b;const j=c%28;return (j===0||j===8)?b:a;}
 const SNS={
 dc:{
- draft:['{school} {nick} 뽑았네 영상 보니까 괜찮던데','{round}라운드면 나쁘지 않게 뽑음','신인은 3년은 기다려야 함 조급해하지 마라','스카우트팀 이번엔 일 좀 했네','{nick} 피지컬 좋더라 잘 키우면 물건','솔직히 이 순번이면 다른 애 뽑았어야 함','고교 성적 보니까 꽤 하던데 프로는 다르다'],
- debut:['{nick} 1군 데뷔했네 ㅎㅇㅌ','신인 {nick} 생각보다 침착하던데','{nick} 계속 1군에 박아두자','데뷔 시즌 이 정도면 합격','{nick} 얼굴 보니까 긴장 1도 안 하더라','신인왕 각 나오냐?'],
- mvp:['{nick} 걍 리그를 씹어먹었네 ㅋㅋㅋ','{stat} 이게 사람이냐','이 정도면 메이저 가는 거 아님? 벌써 불안하다','{nick}신 영구결번 예약','우리 팀에 이런 선수가 있다는 게 실화냐','MVP 투표 {nick} 아니면 조작임','{nick} 하나 보고 연간회원권 끊었다'],
- great:['{nick} 올해 진짜 미쳤다 {stat}','프런트야 연장계약 빨리 해라','시즌 전엔 기대 안 했는데 사과한다 {nickA}','{nick} 없었으면 순위 상상도 하기 싫다','{nick} 각성한 거 맞지?','이 정도면 국대 뽑혀야 함','{nick} 응원가 떼창할 때 소름 돋았다'],
- good:['{nick} 1인분 이상은 했다 인정','{stat}이면 충분하지','내년에 한 단계만 더 올라가자','{nick} 꾸준해서 좋음 기복이 없음','크게 터진 건 아닌데 쏠쏠했다','{nick} 연봉 좀 올려줘도 될 듯'],
- meh:['{nick} 올해는 좀 아쉽다','{stat}... 연봉값은 한 거냐','기복 좀 줄이자 제발','전반기는 좋았는데 후반기에 녹았음','{nick} 이 정도 선수 아니잖아','내년이 진짜 중요하다 {nick}'],
- bad:['{nick} 2군 보내라 진짜','{stat} 이게 맞냐','이걸 계속 쓰는 감독도 문제임','멘탈 나간 거 같은데 좀 쉬게 해줘라','{nick} 나오면 채널 돌림','트레이드 카드로 쓰자 이제','작년 {nick}은 어디 갔냐'],
- futures:['2군에 {nick}{ira} 애 있던데 언제 올라옴?','퓨처스 {stat} 아직은 멀었다','{nick} 포텐 있다던데 진짜냐','2군 성적은 믿거','{nick} 1군 한 번만 써보자 궁금하다','2군 구장 가서 {nick} 봤는데 몸 좋아졌더라'],
- sangmu:['{nick} 상무 가서 몸 만들어 오는 중','전역하면 바로 1군 쓰자','상무 기록 보니까 벌크업 했나보네','군대 다녀오면 터지는 거 국룰 아님?'],
- injury:['{nick} 또 다쳤냐 유리몸이냐','부상만 아니었으면 진짜...','트레이닝 파트 뭐 하냐','{nick} 복귀 언제임?'],
- ks:['우승이다!!!!!!!!! 다들 울고 있냐','{nick} 한국시리즈 미쳤다 ㅠㅠㅠ','이 맛에 야구 본다','우승 굿즈 사러 간다','{ts} 왕조 시작이다'],
- award:['{award} {nick} ㅋㅋ 당연한 결과','{award} 축하한다 {nickA}','{award} 받을 만했지 인정','시상식 정장 핏 미쳤네 ㅋㅋ'],
- fa_stay:['{nick} 잡았다 프런트 일 좀 하네','{money}이면 적당하지','원클럽맨 간다 {nick}','솔직히 좀 오버페이인데 {nick}이니까 봐준다'],
- fa_move:['{nick} 떠나는 거 실화냐 ㅠㅠ','{money}?? 오버페이 아니냐','새 팀 가서도 잘해라 고마웠다','돈 앞에 의리 없다 ㅋㅋ 근데 이해는 함','보상선수 누구 데려오냐가 관건'],
- retire:['{nick} 은퇴라니 시간 진짜 빠르다','고마웠다 {nickA}','은퇴식 예매 전쟁 각','코치로 돌아와라 {nick}'],
- legend:['영구결번 당연하지 ㄹㅇ 레전드','{nick} 같은 선수 다시 나올까','이제 그 번호 아무도 못 단다'],
- mlb:['{nick} 메이저 가서 잘해라','포스팅 금액 얼마 나오냐 ㄷㄷ','미국 가서 망하고 오면 다시 받아줄게','국위선양 하고 와라'],
- hate:['솔직히 운빨 시즌이다 내년에 거품 빠짐','큰 경기에서 보여준 게 없음','{rival} 상대로는 맨날 죽 쑤던데','이 정도로 빨면 내년에 부담 된다 적당히 해라','기록은 좋은데 영양가는 글쎄'],
- defend:['그래도 {nick} 열심히는 하더라','작년 생각하면 아픈 손가락','감독이 기용을 이상하게 하는 것도 있음','{nick} 욕하는 애들 작년엔 빨던 애들임 ㅋㅋ','아직 {age}살이다 기다려줘라'],
- off:['근데 우리 불펜은 진짜 어쩔 거임','감독 작전 보면 혈압 오름','외국인 선수 교체 언제 함?','{rival} 팬들 또 원정 와서 시비 거네','프런트 일 안 하냐 FA 좀 잡아라','내년 유니폼 디자인 유출된 거 봄?'],
+ draft:['{school} {nick} 뽑았네 영상 보니까 괜찮던데','{round}라운드면 나쁘지 않게 뽑음','신인은 3년은 기다려야 함 조급해하지 마라','스카우트팀 이번엔 일 좀 했네','{nick} 피지컬 좋더라 잘 키우면 물건','솔직히 이 순번이면 다른 애 뽑았어야 함','고교 성적 보니까 꽤 하던데 프로는 다르다','{nick} 이름 처음 듣는데 누구냐','드래프트 날만 되면 다들 스카우트 빙의함 ㅋㅋ','고졸은 군 문제부터 생각해야 됨','{nick} 하이라이트 보니까 폼 깔끔하던데','지명 순번 보니 스카우트팀은 확신 있었나 봄'],
+ debut:['{nick} 1군 데뷔했네 ㅎㅇㅌ','신인 {nick} 생각보다 침착하던데','{nick} 계속 1군에 박아두자','데뷔 시즌 이 정도면 합격','{nick} 얼굴 보니까 긴장 1도 안 하더라','신인왕 각 나오냐?','데뷔전 긴장한 거 티 나던데 ㅋㅋ 귀엽','2군 성적 보고 기대 안 했는데 괜찮네','{nick} 응원가 벌써 나왔냐','{nick} 내년엔 개막 엔트리 가자','{num}번 유니폼 벌써 마킹하는 사람 있더라 ㅋㅋ'],
+ mvp:['{nick} 걍 리그를 씹어먹었네 ㅋㅋㅋ','{stat} 이게 사람이냐','이 정도면 메이저 가는 거 아님? 벌써 불안하다','{nick}신 영구결번 예약','우리 팀에 이런 선수가 있다는 게 실화냐','MVP 투표 {nick} 아니면 조작임','{nick} 하나 보고 연간회원권 끊었다','{nick} 없는 날은 야구 안 봄 ㅋㅋ','상대 감독 인터뷰에서 {nick} 얘기만 하더라','올해 {nick} 기록 페이지 들어가 봤는데 숫자가 이상함','해외 스카우트 진짜 왔다 갔겠다'],
+ great:['{nick} 올해 진짜 미쳤다 {stat}','프런트야 연장계약 빨리 해라','시즌 전엔 기대 안 했는데 사과한다 {nickA}','{nick} 없었으면 순위 상상도 하기 싫다','{nick} 각성한 거 맞지?','이 정도면 국대 뽑혀야 함','{nick} 응원가 떼창할 때 소름 돋았다','작년이랑 다른 선수 같음 비시즌에 뭐 했냐','{nick} 연봉협상 구단이 쫄겠네'],
+ good:['{nick} 1인분 이상은 했다 인정','{stat}이면 충분하지','내년에 한 단계만 더 올라가자','{nick} 꾸준해서 좋음 기복이 없음','크게 터진 건 아닌데 쏠쏠했다','{nick} 연봉 좀 올려줘도 될 듯','이 정도면 주전 확정 아님?','{nick} 수비(마운드)에서 안정감 있더라'],
+ meh:['{nick} 올해는 좀 아쉽다','{stat}... 연봉값은 한 거냐','기복 좀 줄이자 제발','전반기는 좋았는데 후반기에 녹았음','{nick} 이 정도 선수 아니잖아','내년이 진짜 중요하다 {nick}','못한 건 아닌데 기대가 컸지','{nick} 부상 숨기고 뛴 거 아님?'],
+ bad:['{nick} 2군 보내라 진짜','{stat} 이게 맞냐','이걸 계속 쓰는 감독도 문제임','멘탈 나간 거 같은데 좀 쉬게 해줘라','{nick} 나오면 채널 돌림','트레이드 카드로 쓰자 이제','작년 {nick}은 어디 갔냐','{nick} 오늘도 했냐? 안 봐도 앎','이 정도면 폼 다시 만들어야 함'],
+ futures:['2군에 {nick}{ira} 애 있던데 언제 올라옴?','퓨처스 {stat} 아직은 멀었다','{nick} 포텐 있다던데 진짜냐','2군 성적은 믿거','{nick} 1군 한 번만 써보자 궁금하다','2군 구장 가서 {nick} 봤는데 몸 좋아졌더라','퓨처스 중계 보는 사람 나밖에 없냐'],
+ sangmu:['{nick} 상무 가서 몸 만들어 오는 중','전역하면 바로 1군 쓰자','상무 기록 보니까 벌크업 했나보네','군대 다녀오면 터지는 거 국룰 아님?','{nick} 전역 언제냐 날짜 세는 중'],
+ injury:['{nick} 또 다쳤냐 유리몸이냐','부상만 아니었으면 진짜...','트레이닝 파트 뭐 하냐','{nick} 복귀 언제임?','무리시킨 코칭스태프 책임도 있다'],
+ ks:['우승이다!!!!!!!!! 다들 울고 있냐','{nick} 한국시리즈 미쳤다 ㅠㅠㅠ','이 맛에 야구 본다','우승 굿즈 사러 간다','{ts} 왕조 시작이다','오늘 회사 못 감 목 쉼','우승 직관한 사람 평생 자랑해라'],
+ award:['{award} {nick} ㅋㅋ 당연한 결과','{award} 축하한다 {nickA}','{award} 받을 만했지 인정','시상식 정장 핏 미쳤네 ㅋㅋ','수상 소감 짧고 굵더라'],
+ fa_stay:['{nick} 잡았다 프런트 일 좀 하네','{money}이면 적당하지','원클럽맨 간다 {nick}','솔직히 좀 오버페이인데 {nick}이니까 봐준다','계약 마지막 2년은 에이징 커브 각오해야 함'],
+ fa_move:['{nick} 떠나는 거 실화냐 ㅠㅠ','{money}?? 오버페이 아니냐','새 팀 가서도 잘해라 고마웠다','돈 앞에 의리 없다 ㅋㅋ 근데 이해는 함','보상선수 누구 데려오냐가 관건','프런트가 협상을 어떻게 했길래'],
+ retire:['{nick} 은퇴라니 시간 진짜 빠르다','고마웠다 {nickA}','은퇴식 예매 전쟁 각','코치로 돌아와라 {nick}','{nick} 데뷔전 본 게 엊그제 같은데'],
+ legend:['영구결번 당연하지 ㄹㅇ 레전드','{nick} 같은 선수 다시 나올까','이제 {num}번 아무도 못 단다','{num}번 = {nick} 공식 성립'],
+ mlb:['{nick} 메이저 가서 잘해라','포스팅 금액 얼마 나오냐 ㄷㄷ','미국 가서 망하고 오면 다시 받아줄게','국위선양 하고 와라','빈자리 누가 메우냐 그게 문제'],
+ hate:['솔직히 운빨 시즌이다 내년에 거품 빠짐','큰 경기에서 보여준 게 없음','{rival} 상대로는 맨날 죽 쑤던데','이 정도로 빨면 내년에 부담 된다 적당히 해라','기록은 좋은데 영양가는 글쎄','홈에서만 잘함 원정 기록 봐라'],
+ defend:['그래도 {nick} 열심히는 하더라','작년 생각하면 아픈 손가락','감독이 기용을 이상하게 하는 것도 있음','{nick} 욕하는 애들 작년엔 빨던 애들임 ㅋㅋ','아직 {age}살이다 기다려줘라','세부 지표는 나쁘지 않던데 운이 없었음'],
+ off:['근데 우리 불펜은 진짜 어쩔 거임','감독 작전 보면 혈압 오름','외국인 선수 교체 언제 함?','{rival} 팬들 또 원정 와서 시비 거네','프런트 일 안 하냐 FA 좀 잡아라','내년 유니폼 디자인 유출된 거 봄?','오늘 구장 치킨 줄 40분 섰다','비시즌 되니까 할 게 없다 야구 언제 하냐'],
+ meme:['오늘도 야구 보다가 혈압 오른 사람 손','야구 끊는다 (내일 다시 봄)','{ts} 응원하는 거 자체가 수행임','치킨 시켰는데 지고 있음 ㅋㅋ','{ts} 팬 하려면 간이 튼튼해야 함','9회만 되면 심장 아파서 화장실 감'],
+ otherfan:['{rival}갤에서 왔는데 {nick} 솔직히 부럽다','{rival} 팬인데 {nick} 타석(등판) 때마다 무서움','{rival}팬) 우리 팀이었으면 벌써 연장계약 함','{rival} 팬인데 {nick} 과대평가 맞음 ㅋㅋ'],
+ neutral:['{nick}? 누구임','이름 처음 듣는데 우리 팀 맞냐','얘 2군에서 잘한다던 걔?','{nick} 기록 찾아보려는데 검색해도 안 나옴'],
+ statB:['{nick} wRC+ {wrcp}면 리그 상위권 아님?','WAR {war}에 wRC+ {wrcp}… 연봉 대비 가성비 미쳤네','타율만 보지 말고 wRC+ 봐라 {wrcp}임','{nick} 출루 능력이 진짜임 세부 지표 다 좋음'],
+ statP:['{nick} FIP {fip}면 운 아니고 실력임','WAR {war}… 이닝 대비 효율 미쳤음','평균자책점보다 FIP가 더 좋은 거 보면 내년이 더 기대됨'],
  teamTop:['올해 {ts} 진짜 강하다 {rank}위 실화','이 전력으로 우승 못 하면 감독 책임'],
  teamBottom:['{rank}위 ㅋㅋㅋ 이게 팀이냐','감독 나가라 진짜','리빌딩 한다더니 뭐 한 거냐'],
- contract:['{nick} FA 앞두고 이러면 몸값 장난 아니겠다'],bigmoney:['연봉 {salary} 받고 이게 맞냐'],cheap:['연봉 {salary}에 이 활약이면 혜자다'],
+ contract:['{nick} FA 앞두고 이러면 몸값 장난 아니겠다','FA 직전 시즌에 각성하는 건 국룰이지'],bigmoney:['연봉 {salary} 받고 이게 맞냐'],cheap:['연봉 {salary}에 이 활약이면 혜자다'],
  vet:['{nick} 나이 생각하면 대단하다','에이징 커브 오는 거 아님?'],young:['{age}살에 이 정도면 미래가 밝다'],
- hr30:['{hr}홈런 ㄷㄷ 거포 맞네'],sb30:['{sb}도루 발 미쳤다'],avg330:['타율 {avg} 실화냐 타격기계'],era25:['평균자책점 {era} 이게 되네'],so180:['탈삼진 {so}개 닥터K 등장'],sv30:['{sv}세이브 뒷문 걱정 끝']},
-dcReply:['ㄹㅇㅋㅋ','ㅇㅈ','이건 좀 아닌 듯','개추','반박 시 니 말이 맞음','ㄴㄴ 작년이 더 나았음','이게 맞지','선 넘네 ㅋㅋ','팩트) 맞는 말임'],
+ hr30:['{hr}홈런 ㄷㄷ 거포 맞네'],sb30:['{sb}도루 발 미쳤다'],avg330:['타율 {avg} 실화냐 타격기계'],era25:['평균자책점 {era} 이게 되네'],so180:['탈삼진 {so}개 닥터K 등장'],sv30:['{sv}세이브 뒷문 걱정 끝'],
+ clutchHero:['{clutch} {nick} 미쳤다 ㅋㅋㅋㅋ 소리 질렀음','그 상황에서 {nick} 강심장 인정','{nick} 큰 경기 체질 확정','{clutch} 장면 무한반복 중','옆집에서도 소리 지르더라 ㅋㅋㅋ'],
+ clutchFail:['{clutch} {nick} 거기서 그러면 어떡하냐…','{nick} 큰 경기에서 또 작아졌네','그 상황에 {nick} 쓴 감독이 문제지','{nick} 오늘 잠 못 잘 듯 본인이 제일 속상하겠지','한 경기로 선수 욕하지 마라 시즌 내내 잘했음'],
+ raceWin:['5강 막차 탔다!!! 최종전 {nickI} 살렸다','{nick} 덕분에 가을야구 간다 ㅠ'],
+ raceLose:['5위 문턱에서 끝… 아쉽다','최종전 그 장면만 계속 생각남']},
+dcReply:['ㄹㅇㅋㅋ','ㅇㅈ','이건 좀 아닌 듯','개추','반박 시 니 말이 맞음','ㄴㄴ 작년이 더 나았음','이게 맞지','선 넘네 ㅋㅋ','팩트) 맞는 말임','뇌절 ㄴ','ㅋㅋㅋㅋㅋ 미쳤냐','출처는?','이건 인정','어제 직관 갔는데 진짜임','ㄴ 니가 감독해라 그럼','또 시작이네','어그로 ㄴ','기록 보고 말해라 좀','ㅋㅋ 내일 되면 또 말 바뀜','{rival}팬 같은데'],
+dcNick:['잠실직관러','9회말2아웃','불펜방화범','직관요정','야구는구라다','외야석지박령','삼진은싫어','희생번트반대','퓨처스덕후','통산기록러'],
 x:{
- draft:['우리 팀 신인 {name} 선수 환영해요 🎉','{school} {name}!! 드래프트 영상 백 번 돌려봄','{name} 선수 인터뷰 보는데 너무 풋풋하다ㅠ','입단식 사진 떴다 {nick} 유니폼 잘 어울려'],
- debut:['{name} 1군 데뷔 축하해 ⚾ 오늘 직관한 사람 승리','데뷔전 보고 왔는데 {nick} 떨지도 않더라','{nick} {firstThing} 공 받은 사람 부럽다','신인 {nick} 입덕 완료'],
- mvp:['오늘도 우리 {nick} 최고야 🥹','{nick} 유니폼 품절이래요… 재입고 언제','{stat} 실화인가요 {nick} 사랑해 ⚾','{nick} 보려고 원정까지 다 따라다녔다','올해 {ts}는 {nickI} 다 했다 진짜'],
- great:['{nick} 올 시즌 행복했다 진짜 🥹','직관 갈 때마다 {nickI} 해줬어','{nick} 포토카드 교환하실 분 구해요','{nick} 응원가 하루 종일 흥얼거림','시즌 끝나니까 벌써 {nick} 보고 싶다'],
- good:['{nick} 올 시즌 수고했어 ⚾ 내년엔 더 높이!','{nick} 응원가 아직도 귀에 맴돈다','{nick} 팬서비스 진짜 좋더라 사인 받음','꾸준한 {nick} 최고'],
- meh:['{nick} 힘내… 우리는 기다릴게','올해는 좀 힘들었지만 응원은 계속된다','{nick} 표정이 너무 어두워서 걱정','내년엔 웃는 모습 더 보자 {nick}'],
- bad:['{nick} 너무 힘들어 보여서 마음 아프다','악플 좀 그만… {nick} 아직 할 수 있다고요','{nick} 개인 SNS 댓글 보고 화남. 선 넘지 마세요','그래도 난 {nick} 편'],
- futures:['2군 경기 갔다가 {nick} 사인 받음!! 언젠가 1군에서 보자','{nick} 2군에서 열심히 하는 거 다 보고 있어','퓨처스 중계로 {nick} 보는 맛','{nick} 1군 콜업 기도 중 🙏'],
+ draft:['우리 팀 신인 {name} 선수 환영해요 🎉','{school} {name}!! 드래프트 영상 백 번 돌려봄','{name} 선수 인터뷰 보는데 너무 풋풋하다ㅠ','입단식 사진 떴다 {nick} 유니폼 잘 어울려','{nick} 등번호 {num}번이래 벌써 정이 감','드래프트 중계 보다가 {nick} 이름 불리는 순간 소리 지름'],
+ debut:['{name} 1군 데뷔 축하해 ⚾ 오늘 직관한 사람 승리','데뷔전 보고 왔는데 {nick} 떨지도 않더라','{nick} {firstThing} 공 받은 사람 부럽다','신인 {nick} 입덕 완료','{num}번 {nick} 마킹 주문 완료 ✌️','{nick} 데뷔전 직캠 화질 미쳤다…'],
+ mvp:['오늘도 우리 {nick} 최고야 🥹','{nick} 유니폼 품절이래요… 재입고 언제','{stat} 실화인가요 {nick} 사랑해 ⚾','{nick} 보려고 원정까지 다 따라다녔다','올해 {ts}는 {nickI} 다 했다 진짜','{num}번 유니폼 입은 사람이 구장 반은 되는 듯'],
+ great:['{nick} 올 시즌 행복했다 진짜 🥹','직관 갈 때마다 {nickI} 해줬어','{nick} 포토카드 교환하실 분 구해요','{nick} 응원가 하루 종일 흥얼거림','시즌 끝나니까 벌써 {nick} 보고 싶다','{nick} 시즌 하이라이트 영상 만들었어요 (5분)'],
+ good:['{nick} 올 시즌 수고했어 ⚾ 내년엔 더 높이!','{nick} 응원가 아직도 귀에 맴돈다','{nick} 팬서비스 진짜 좋더라 사인 받음','꾸준한 {nick} 최고','{nick} 퇴근길 손 흔들어줌… 심장아'],
+ meh:['{nick} 힘내… 우리는 기다릴게','올해는 좀 힘들었지만 응원은 계속된다','{nick} 표정이 너무 어두워서 걱정','내년엔 웃는 모습 더 보자 {nick}','비시즌엔 푹 쉬어 {nick}'],
+ bad:['{nick} 너무 힘들어 보여서 마음 아프다','악플 좀 그만… {nick} 아직 할 수 있다고요','{nick} 개인 SNS 댓글 보고 화남. 선 넘지 마세요','그래도 난 {nick} 편','솔직히 올해 {nick} 보는 게 좀 힘들었다… 그래도 내년'],
+ futures:['2군 경기 갔다가 {nick} 사인 받음!! 언젠가 1군에서 보자','{nick} 2군에서 열심히 하는 거 다 보고 있어','퓨처스 중계로 {nick} 보는 맛','{nick} 1군 콜업 기도 중 🙏','2군 구장 가는 길 너무 멀다 그래도 {nick} 보러 감'],
  sangmu:['상무 {nick} 경기 보러 문경 다녀옴','{nick} 전역 디데이 세는 중','군복 입은 {nick} 사진 떴다…'],
  injury:['{nick} 아프지 마ㅠㅠ 빨리 돌아와','부상 소식 듣고 하루 종일 우울','{nick} 재활 잘 해서 건강하게만 돌아와'],
- ks:['우승!!!!!!! 🏆 {team} 사랑해','{nick} 우승 세리머니 보고 울었다','우승 확정 순간 옆자리 모르는 분이랑 껴안음','이 날을 평생 기억할 거야 🏆'],
+ ks:['우승!!!!!!! 🏆 {team} 사랑해','{nick} 우승 세리머니 보고 울었다','우승 확정 순간 옆자리 모르는 분이랑 껴안음','이 날을 평생 기억할 거야 🏆','우승 기념 티셔츠 줄이 구장 한 바퀴임 ㅋㅋ'],
  award:['{nick} {award} 축하해!! 🏆','{award} {nick}!! 시상식 수트핏 무슨 일이야','{nick} 수상 소감에서 팬들 얘기해줘서 울컥'],
  fa_stay:['{nick} 남아줘서 고마워 ㅠㅠ 평생 {ts}','{nick} 원클럽맨 가자','계약 소식 듣고 소리 질렀다'],
- fa_move:['{nick} 이적이라니… 그동안 고마웠어','새 유니폼도 잘 어울리네 {nick}','{nick} 굿즈 정리 못 하겠다…','이적해도 응원할게 우리 팀 상대할 때만 빼고'],
- retire:['{nick} 은퇴식 보고 펑펑 울었다','평생 기억할게 {nick} ⚾','마지막 경기에서 다 같이 응원가 부른 거 잊지 못해'],
- legend:['{nick} 등번호 영구결번 확정 🥹 이제 아무도 못 단다','영구결번식 직관 성공… 평생 자랑할 거야'],
+ fa_move:['{nick} 이적이라니… 그동안 고마웠어','새 유니폼도 잘 어울리네 {nick}','{nick} 굿즈 정리 못 하겠다…','이적해도 응원할게 우리 팀 상대할 때만 빼고','새 팀에서도 {num}번 달았으면 좋겠다'],
+ retire:['{nick} 은퇴식 보고 펑펑 울었다','평생 기억할게 {nick} ⚾','마지막 경기에서 다 같이 응원가 부른 거 잊지 못해','{num}번 유니폼은 평생 옷장에 걸어둘 거야'],
+ legend:['{nick} {num}번 영구결번 확정 🥹 이제 아무도 못 단다','영구결번식 직관 성공… 평생 자랑할 거야','구장에 걸린 {num}번 보고 울컥'],
  mlb:['{nick} 미국에서도 응원할게 ⚾','새벽 중계 알람 맞춰둠 {nick} 화이팅','{nick} MLB 유니폼 합성해봤는데 잘 어울림'],
- nerdB:['{nick} 올해 wRC {wrc} 찍었네 ㄷㄷ','{nick} WAR {war}… 팀 내 최상위권','세부 지표 보면 {nick} 운빨 아님'],
- nerdP:['{nick} FIP 보면 운도 아니었음','{nick} 이닝 소화력 진짜 대단','WAR {war}면 리그 정상급 투수'],
- off:['내일 직관 가는 사람 손','응원봉 배터리 다 됐네… 비상','구장 먹거리 추천 좀','{ts} 굿즈 신상 너무 예쁘다'],
+ nerdB:['{nick} 올해 wRC+ {wrcp} 찍었네 ㄷㄷ','{nick} WAR {war}… 팀 내 최상위권','세부 지표 보면 {nick} 운빨 아님 (wRC+ {wrcp})'],
+ nerdP:['{nick} FIP {fip} 보면 운도 아니었음','{nick} 이닝 소화력 진짜 대단','WAR {war}면 리그 정상급 투수'],
+ off:['내일 직관 가는 사람 손','응원봉 배터리 다 됐네… 비상','구장 먹거리 추천 좀','{ts} 굿즈 신상 너무 예쁘다','비시즌 너무 길다 야구 보고 싶어'],
+ clutchHero:['{clutch} {nick}!!!!!!! 🥹🥹','방금 {nick} 장면 보고 소리 질러서 이웃한테 죄송','{nick} 큰 경기 체질인 거 이제 다 알았지','{clutch} 직관한 사람 손 (나)'],
+ clutchFail:['{nick} 괜찮아… 시즌 내내 잘했잖아','오늘은 {nick} 혼자 진 게 아니야','{nick} 고개 숙이지 마 ㅠ'],
  hr30:['{hr}호 홈런 축하해 {nick} 💣'],sb30:['{nick} 도루 {sb}개 발이 그냥 빛의 속도'],so180:['{nick} 탈삼진 {so}개!! 닥터K'],sv30:['{sv}세이브 {nick} 수호신 그 자체']},
+xHandle:[['yagu','dugout','base','strike','homerun','glove','inning','bleacher','fastball','mound'],['fan','love','diary','life','note','day','log','zip']],
 nvHead:{
  draft:['{team}, {round}라운드서 {school} {name} 지명',"'{school} 에이스' {name}, {team} 유니폼 입는다",'{team} 스카우트 "{name}, 성장 가능성 높다"'],
  debut:['{team} 신인 {name}, 1군 무대 첫선',"'겁 없는 신인' {name}, 데뷔 시즌 합격점"],
@@ -352,11 +369,13 @@ nvHead:{
  fa_stay:['{name}, {team} 잔류… {money} 계약','{team}, 프랜차이즈 스타 {name} 붙잡았다'],
  fa_move:['{name}, {team} 이적… {money} FA 계약','FA 시장 큰손 {team}, {name} 영입'],
  retire:['{name}, 정든 그라운드 떠난다','{name} 은퇴 "행복한 야구 인생이었다"'],
- legend:['{team}, {name} 등번호 영구결번 결정','전설이 된 {name}, 등번호 영원히 남는다'],
- mlb:['{name}, 메이저리그 포스팅 신청… 미국 무대 도전','{name} 빅리그 도전, 복수 구단 관심']},
+ legend:['{team}, {name} 등번호 {num}번 영구결번 결정','전설이 된 {name}, {num}번 영원히 남는다'],
+ mlb:['{name}, 메이저리그 포스팅 신청… 미국 무대 도전','{name} 빅리그 도전, 복수 구단 관심'],
+ clutchHero:["'{clutch}' {name}, 승부처에서 빛났다",'{name}, 가장 중요한 순간에 해냈다'],
+ clutchFail:['{name}, 승부처서 고개 숙였다… "다음엔 꼭"','아쉬움 삼킨 {name}, {clutch}서 침묵']},
 nv:{
- draft:['잘 키워서 프랜차이즈 스타 만들자','고교 때 영상 봤는데 물건이다','신인은 일단 체력부터','몇 년 뒤가 기대된다'],
- debut:['첫 시즌치고 괜찮았다','긴장 안 하는 게 보기 좋네','신인왕 후보로 손색없다','기회 꾸준히 줘라'],
+ draft:['잘 키워서 프랜차이즈 스타 만들자','고교 때 영상 봤는데 물건이다','신인은 일단 체력부터','몇 년 뒤가 기대된다','이 순번에 뽑을 선수는 아닌 것 같은데'],
+ debut:['첫 시즌치고 괜찮았다','긴장 안 하는 게 보기 좋네','신인왕 후보로 손색없다','기회 꾸준히 줘라','아직 판단하긴 이르다'],
  mvp:['국가대표 붙박이감이다','이런 선수가 메이저 가야지','구단아 연봉 팍팍 올려줘라','올해 MVP는 고민할 것도 없다','이 정도면 리그 역사급 시즌'],
  great:['국가대표 뽑아야 한다','올해 같은 시즌 몇 년만 더','진짜 많이 늘었다','장기계약 서둘러라','이제 리그 정상급이다'],
  good:['꾸준하면 좋은 선수 되겠다','올해 정도만 해줘도 충분','한 단계만 더 올라가면 스타','성실한 게 보인다'],
@@ -370,11 +389,14 @@ nv:{
  retire:['한 시대가 끝났다','지도자로 꼭 돌아와라','고생 많았습니다'],
  legend:['이견 없는 결정','KBO 역사에 남을 선수','당연한 영구결번'],
  mlb:['가서 증명하고 와라','KBO에서 보여줄 건 다 보여줬다','부상 없이 잘하길'],
- hate:['한 시즌 반짝일 수도 있다','국제대회 가서 증명해봐라','언론이 너무 띄운다'],
+ clutchHero:['이런 게 스타지','큰 경기에서 해주는 선수가 진짜다','소름 돋았다 진짜'],
+ clutchFail:['그 상황이면 누구라도 어렵다','한 경기로 시즌 평가하지 맙시다','감독 선택이 더 아쉬웠다'],
+ hate:['한 시즌 반짝일 수도 있다','국제대회 가서 증명해봐라','언론이 너무 띄운다','기록 대비 영양가가 아쉽다'],
  defend:['그래도 팀에 필요한 선수다','욕할 시간에 응원 한 번 더','부상 여파도 있었다'],
- rival:['{rival} 팬인데 솔직히 부럽다','{rival} 팬이다. 우리 팀이었으면 좋겠다','{rival} 팬인데 이 선수만 나오면 무섭다']},
+ rival:['{rival} 팬인데 솔직히 부럽다','{rival} 팬이다. 우리 팀이었으면 좋겠다','{rival} 팬인데 이 선수만 나오면 무섭다'],
+ off:['기사 사진 잘 뽑았네','감독은 언제 바뀌냐','이 팀 프런트는 반성해라','기자님 제목 너무 자극적이다','그래서 불펜 보강은 언제 하나']},
 cafe:{
- draft:[['[환영] 신인 {name} 선수 정보 정리했습니다','고교 기록이랑 스카우팅 리포트 모아봤어요'],['{name} 선수 고교 시절 하이라이트 모음','영상 출처는 각 대회 중계입니다']],
+ draft:[['[환영] 신인 {name} 선수 정보 정리했습니다','고교 기록이랑 스카우팅 리포트 모아봤어요'],['{name} 선수 고교 시절 하이라이트 모음','영상 출처는 각 대회 중계입니다'],['{nick} 선수 등번호 {num}번 확정이래요','마킹 주문하실 분 참고하세요']],
  debut:[['[직관 후기] {nick} 데뷔전 보고 왔어요','첫 타석(등판) 때 박수 엄청 쳤네요'],['신인 {nick} 응원 문구 같이 정해요','후보 3개 투표 받아요']],
  mvp:[['[스압] {nick} 올 시즌 기록 총정리','주요 기록이랑 경기별 하이라이트 다 정리했어요'],['{nick} MVP 기원 현수막 모금합니다','오프라인 모금으로만 진행합니다'],['[직관 후기] 오늘 {nick} 미쳤어요','응원석에서 목 다 쉬었습니다']],
  great:[['[칭찬] {nick} 올 시즌 기록 정리해봤습니다','작년이랑 비교하면 확실히 늘었어요'],['{nick} 사인회 후기 (사진 많음)','팬서비스 너무 좋았어요ㅠ']],
@@ -388,52 +410,79 @@ cafe:{
  fa_stay:[['[속보] {nick} 잔류!!! 축하합시다','계약 조건 정리해둘게요']],
  fa_move:[['{nick} 선수 그동안 감사했습니다','좋은 추억 남겨줘서 고마워요']],
  retire:[['[은퇴] {nick} 선수 마지막 경기 직관 후기','눈물 없이 못 봤어요']],
- legend:[['[영구결번] 축하 현수막 모금합니다','영구결번식 단체 관람도 추진해요']],
- mlb:[['{nick} MLB 도전 응원 메시지 모아요','선수에게 전달될 수 있게 정리할게요']]}};
-const POSITIVE=['mvp','great','good','ks','award','debut','draft','fa_stay','legend','mlb'];
+ legend:[['[영구결번] {num}번 축하 현수막 모금합니다','영구결번식 단체 관람도 추진해요']],
+ mlb:[['{nick} MLB 도전 응원 메시지 모아요','선수에게 전달될 수 있게 정리할게요']],
+ clutchHero:[['[직관 후기] {clutch} 그 순간 영상 있습니다','손 떨려서 화질 죄송해요']],
+ clutchFail:[['[부탁] {nick} 선수에게 악플 달지 맙시다','오늘 제일 속상한 건 선수 본인입니다']]}};
+const POSITIVE=['mvp','great','good','ks','award','debut','draft','fa_stay','legend','mlb','clutchHero','raceWin'];
+// 반응 수치: 팬 수(로그 스케일) × 이벤트 크기 × 로그정규 분산. 대부분은 작고 가끔 크게 터진다.
+const HYPE={draft:.7,debut:.9,mvp:1.8,great:1.3,good:.9,meh:.8,bad:1.1,futures:.35,sangmu:.35,injury:.8,ks:2.2,award:1.4,fa_stay:1.6,fa_move:2,retire:1.5,legend:2.2,mlb:2,clutchHero:2,clutchFail:1.6,raceWin:1.4,raceLose:1};
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const logn=(m,s)=>m*Math.exp(gauss()*s);
+function fameLv(){return clamp((Math.log10(Math.max(G.fans,100))-2.5)/2.5,0,1.3);}
 function fillT(t,c){return t.replace(/\{(\w+)\}/g,(_,k)=>c[k]??'');}
 function snsCtx(x={}){const nm=G.name,t=G.team>=0?team(G.team):null;const nk=nm.length>=3?nm.slice(1):nm;
   const others=TEAMS.filter((_,i)=>i!==G.team);
   return {name:nm,nick:nk,nickA:nk+josa(nk,'아','야'),nickI:nk+josa(nk,'이가','가'),ira:josa(nk,'이라는','라는'),team:t?t.n:'',ts:t?t.s:'',school:G.school,
-    age:G.age,year:G.year,rival:pick(others).s,firstThing:G.type==='B'?'첫 안타':'첫 탈삼진',salary:won(G.salary),...x};}
+    age:G.age,year:G.year,rival:pick(others).s,firstThing:G.type==='B'?'첫 안타':'첫 탈삼진',salary:won(G.salary),num:G.num??'',...x};}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function makeSNS(moods,c,tags=[]){
-  const big=clamp(G.fans/3000,.3,60),num=(a,b)=>Math.max(1,Math.round(rnd(a,b)*big));
+  const f=fameLv(),hy=Math.max(...moods.map(m=>HYPE[m]||1));
   const pos=POSITIVE.includes(moods[0]);
+  const low=f<.35&&!['legend','retire','mlb','ks','draft'].includes(moods[0]);
   const draw=(pool,n)=>shuffle((pool||[]).slice()).slice(0,n);
   const P=(plat,key)=>SNS[plat][key]||[];
-  // 디시: 주 반응 + 상황 태그 + 반대 의견 + 잡담을 섞는다
-  let dc=[...draw(P('dc',moods[0]),2)];
-  moods.slice(1).forEach(m=>dc.push(...draw(P('dc',m),1)));
-  tags.forEach(t=>dc.push(...draw(P('dc',t),1)));
-  if(chance(.45))dc.push(...draw(P('dc',pos?'hate':'defend'),1));
-  if(chance(.4))dc.push(...draw(P('dc','off'),1));
-  dc=shuffle([...new Set(dc)]).slice(0,ri(3,5)).map(t=>({t:fillT(t,c),who:`ㅇㅇ(${ri(1,223)}.${ri(1,255)})`,rec:num(3,90),cm:ri(0,Math.round(8+big*3)),rp:chance(.4)?pick(SNS.dcReply):null}));
-  // X
+  const isB=G.type==='B',hasStat=isB?c.wrcp!=null:c.fip!=null;
+  // 디시: 주 반응 + 상황 태그 + 반대 의견 + 타팀팬 + 잡담·밈을 섞는다
+  const dcPool=[];const add=(arr,h)=>arr.forEach(t=>dcPool.push([t,h]));
+  add(draw(P('dc',moods[0]),2));
+  moods.slice(1).forEach(m=>add(draw(P('dc',m),1)));
+  tags.forEach(t=>add(draw(P('dc',t),1)));
+  if(low&&chance(.7))add(draw(P('dc','neutral'),1),'질문');
+  if(chance(.5))add(draw(P('dc',pos?'hate':'defend'),1));
+  if(hasStat&&chance(.45))add(draw(P('dc',isB?'statB':'statP'),1),'분석');
+  if(chance(.3))add(draw(P('dc','otherfan'),1));
+  if(chance(.35))add(draw(P('dc','off'),1));
+  if(chance(.3))add(draw(P('dc','meme'),1));
+  const seen=new Set();
+  const dc=shuffle(dcPool.filter(([t])=>!seen.has(t)&&seen.add(t))).slice(0,ri(4,6)).map(([t,h])=>{
+    const tx=fillT(t,c);let rec=Math.round(logn(1.2*Math.pow(10,f*.7)*Math.sqrt(hy),.9));const best=chance(.07)&&f>.2;if(best)rec=Math.round(rec*rnd(6,15))+10;
+    const cm=Math.round(logn(2.5*Math.pow(10,f*.5)*hy,.75));
+    const rp=draw(SNS.dcReply,Math.min(cm,chance(.5)?ri(1,2):0)).map(x=>fillT(x,c));
+    return {t:tx,h:h||(/[?냐]$|임\?$/.test(tx)?'질문':'일반'),who:chance(.2)?pick(SNS.dcNick):`ㅇㅇ(${ri(1,223)}.${ri(1,255)})`,rec,cm,best,rp};
+  });
+  // X: 팬 계정 위주 + 기록 덕후 + 일상
   let xs=[...draw(P('x',moods[0]),1)];
   moods.slice(1).forEach(m=>xs.push(...draw(P('x',m),1)));
   tags.forEach(t=>xs.push(...draw(P('x',t),1)));
-  if(c.war!=null&&+c.war>=3&&chance(.6))xs.push(...draw(P('x',G.type==='B'?'nerdB':'nerdP'),1));
-  if(chance(.25))xs.push(...draw(P('x','off'),1));
-  xs=shuffle([...new Set(xs)]).slice(0,ri(2,3)).map(t=>({t:fillT(t,c)+(chance(.45)&&c.ts?` #${c.ts} #${c.nick}`:''),who:'@'+pick(['yagu','dugout','base','strike','homerun','glove','inning','bleacher'])+'_'+pick(['fan','love','diary','life','note','day'])+ri(1,99),like:num(10,900),rt:num(2,200)}));
-  // 네이버 기사 + 댓글 (공감순)
+  if(hasStat&&c.war!=null&&+c.war>=2.5&&chance(.55))xs.push(...draw(P('x',isB?'nerdB':'nerdP'),1));
+  if(chance(.3))xs.push(...draw(P('x','off'),1));
+  xs=shuffle([...new Set(xs)]).slice(0,ri(2,4)).map(t=>{const like=Math.round(logn(6*Math.pow(10,f*1.3)*hy,1));
+    return {t:fillT(t,c)+(chance(.35)&&c.ts?` #${c.ts} #${c.nick}`:''),who:'@'+pick(SNS.xHandle[0])+'_'+pick(SNS.xHandle[1])+(chance(.6)?ri(1,99):''),like,rt:Math.round(like*rnd(.03,.22)),rpl:Math.round(like*rnd(.01,.06))};});
+  // 네이버 기사 + 댓글 (순공감순). 비판 댓글은 비공감도 많이 받는다
   let nv=null;const hp=SNS.nvHead[moods[0]];
-  if(hp){let cm=draw(SNS.nv[moods[0]],2);
-    if(chance(.5))cm.push(...draw(SNS.nv[pos?'hate':'defend'],1));
-    if(chance(.35)&&c.rival)cm.push(...draw(SNS.nv.rival,1));
-    cm=cm.map(t=>({t:fillT(t,c),who:pick(['yagu','kbo','dugout','mound','homerun','bullpen','ace','base','infield'])+ri(1,99)+'****',up:num(10,450),dn:num(1,80),rp:ri(0,40)})).sort((a,b)=>b.up-a.up);
+  if(hp){const pool=[];draw(SNS.nv[moods[0]],2).forEach(t=>pool.push([t,0]));
+    if(moods[1]&&SNS.nv[moods[1]])draw(SNS.nv[moods[1]],1).forEach(t=>pool.push([t,0]));
+    if(chance(.55))draw(SNS.nv[pos?'hate':'defend'],1).forEach(t=>pool.push([t,pos?1:0]));
+    if(chance(.3)&&c.rival)draw(SNS.nv.rival,1).forEach(t=>pool.push([t,0]));
+    if(chance(.35))draw(SNS.nv.off,1).forEach(t=>pool.push([t,.5]));
+    const top=logn(14*Math.pow(10,f*1.4)*hy,.5);
+    const cm=shuffle(pool).slice(0,5).map(([t,neg],k)=>{const up=Math.max(0,Math.round(top*Math.pow(rnd(.3,.7),k)*(neg===1?rnd(.4,.9):1)));
+      const dn=Math.round(up*(neg===1?rnd(.5,1.6):neg?rnd(.1,.4):rnd(.02,.15)));
+      return {t:fillT(t,c),who:pick(['yagu','kbo','dugout','mound','homerun','bullpen','ace','base','infield','glove'])+ri(1,99)+'****',up,dn,rp:Math.round(up*rnd(.01,.05))+ri(0,2)};})
+      .sort((a,b)=>(b.up-b.dn)-(a.up-a.dn));
     nv={head:fillT(pick(hp),c),cm};}
   // 카페
-  const cafe=draw(SNS.cafe[moods[0]]||SNS.cafe[moods[1]],ri(1,2)).map(([a,b])=>({t:fillT(a,c),pv:fillT(b,c),v:num(80,3000),cm:num(3,140)}));
-  return {v:2,nv,dc,x:xs,cafe,gal:c.ts||'',cafeName:`${c.cafe||c.team||c.school} 팬카페`};
+  const cafe=draw(SNS.cafe[moods[0]]||SNS.cafe[moods[1]],ri(1,2)).map(([a,b])=>{const v=Math.round(logn(110*Math.pow(10,f*.9)*hy,.5));return {t:fillT(a,c),pv:fillT(b,c),v,cm:Math.round(v*rnd(.012,.05))};});
+  return {v:3,nv,dc,x:xs,cafe,gal:c.ts||'',cafeName:`${c.cafe||c.team||c.school} 팬카페`};
 }
-function snsCount(f){return f&&f.v===2?(f.nv?1:0)+(f.dc.length?1:0)+f.x.length+(f.cafe.length?1:0):0;}
+function snsCount(f){return f&&f.v>=2?(f.nv?1:0)+(f.dc.length?1:0)+f.x.length+(f.cafe.length?1:0):0;}
 function keyStat(r){const s=r.s;
   if(G.type==='B'){const x=slash(s);return `타율 ${f3(x.avg)} ${s.HR}홈런`;}
   if(s.SV>=10)return `${s.SV}세이브 평균자책점 ${f2(s.ERA)}`;
   if(s.HLD>=10)return `${s.HLD}홀드 평균자책점 ${f2(s.ERA)}`;
   return `${s.W}승 평균자책점 ${f2(s.ERA)}`;}
-const AW_PRI=['정규시즌 MVP','최동원상','신인상','골든글러브','KBO 수비상','홈런왕','타격왕','평균자책점왕','탈삼진왕','세이브왕','다승왕'];
+const AW_PRI=['정규시즌 MVP','한국시리즈 MVP','최동원상','신인상','골든글러브','KBO 수비상','홈런왕','타격왕','평균자책점왕','탈삼진왕','세이브왕','다승왕'];
 function seasonSNS(L){
   const main=L.recs.find(r=>r.lvl==='1군'),m=[],tags=[];
   if(main){const w=main.s.WAR;m.push(w>=6?'mvp':w>=3.5?'great':w>=1.5?'good':w>=0?'meh':'bad');if(L.firstYear&&w<3.5)m.unshift('debut');}
@@ -442,16 +491,19 @@ function seasonSNS(L){
   let aw='';if(won.length){aw=won.map(a=>a.a).sort((a,b)=>{const ia=AW_PRI.findIndex(x=>a.startsWith(x)),ib=AW_PRI.findIndex(x=>b.startsWith(x));return (ia<0?99:ia)-(ib<0?99:ib);})[0];m.splice(1,0,'award');}
   if(main&&L.ts.result==='한국시리즈 우승')m.splice(1,0,'ks');
   if(L.inj)m.push('injury');
-  const r=main||L.recs[0],s=r.s,x={stat:keyStat(r),award:aw,rank:L.ts.rank};
+  const cl=(L.clutch||[]).slice().sort((a,b)=>(b.big||0)-(a.big||0))[0];
+  if(cl){if(cl.ok)m.unshift('clutchHero');else m.splice(1,0,'clutchFail');}
+  if((L.clutch||[]).some(c=>c.kind==='race'))tags.push(L.ts.rank<=5?'raceWin':'raceLose');
+  const r=main||L.recs[0],s=r.s,x={stat:keyStat(r),award:aw,rank:L.ts.rank,clutch:cl?cl.short:''};
   if(L.ts.rank<=2)tags.push('teamTop');else if(L.ts.rank>=8)tags.push('teamBottom');
   if(main){
     const w=main.s.WAR;x.war=f1(w);
     if(G.age<=23&&w>=2)tags.push('young');if(G.age>=34&&w>=2)tags.push('vet');
     if(G.faClock===G.faNeed-1&&w>=2)tags.push('contract');
     if(G.salary>=8&&w<1.5)tags.push('bigmoney');if(G.salary<1.5&&w>=3)tags.push('cheap');
-    if(G.type==='B'){const sl=slash(s),wr=wrcPlus(s);x.hr=s.HR;x.sb=s.SB;x.avg=f3(sl.avg);x.wrc=wr?wr.wrc:0;
+    if(G.type==='B'){const sl=slash(s),wr=wrcPlus(s);x.hr=s.HR;x.sb=s.SB;x.avg=f3(sl.avg);x.wrc=wr?wr.wrc:0;if(wr&&s.PA>=150)x.wrcp=wr.plus;
       if(s.HR>=30)tags.push('hr30');if(s.SB>=30)tags.push('sb30');if(s.PA>=446&&sl.avg>=.33)tags.push('avg330');}
-    else{x.era=f2(s.ERA);x.so=s.SO;x.sv=s.SV;
+    else{x.era=f2(s.ERA);x.so=s.SO;x.sv=s.SV;if(s.outs>=90)x.fip=f2(fipOf(s));
       if(s.outs>=432&&s.ERA<2.5)tags.push('era25');if(s.SO>=180)tags.push('so180');if(s.SV>=30)tags.push('sv30');}
   }
   return makeSNS(m,snsCtx(x),shuffle(tags).slice(0,2));
@@ -461,7 +513,9 @@ function franchise(){
   const e=Object.entries(by).sort((a,b)=>b[1].war-a[1].war)[0];if(!e)return null;
   const mvp=G.awards.filter(a=>a.a==='정규시즌 MVP').length,ring=G.awards.filter(a=>a.a==='한국시리즈 우승').length;
   const score=Math.round(e[1].war+mvp*4+ring*3+(e[1].n>=15?5:0));
-  return {team:e[0],war:e[1].war,n:e[1].n,score,retired:e[1].n>=12&&score>=FR_LINE&&G.retireReason!=='mlb'};
+  const nc={};G.career.filter(r=>r.lvl==='1군'&&r.team===e[0]&&r.num!=null).forEach(r=>nc[r.num]=(nc[r.num]||0)+1);
+  const num=+(Object.entries(nc).sort((a,b)=>b[1]-a[1])[0]||[G.num])[0];
+  return {team:e[0],num,war:e[1].war,n:e[1].n,score,retired:e[1].n>=12&&score>=FR_LINE&&G.retireReason!=='mlb'};
 }
 function meetOptions(){
   const o=[{k:'keep',n:'지금처럼 간다',d:'보직과 스타일을 그대로 유지한다'}];
@@ -515,6 +569,8 @@ function grade(v){v=Math.round(v);return v>=78?'엘리트':v>=70?'플러스플�
 function velo(){return Math.round(134+(G.r.stf-20)*.36);}
 function won(x){return x<1?Math.round(x*10000).toLocaleString()+'만원':(Math.round(x*10)/10)+'억원';}
 function team(i){return TEAMS[i];}
+function parseNum(v){v=String(v??'').trim();if(!/^\d{1,2}$/.test(v))return null;return +v;}
+function numBox(){return `<div class="numset"><label class="lbl" for="jNum">등번호</label><input id="jNum" type="number" min="0" max="99" inputmode="numeric" value="${G.num}"><button class="btn sec" data-act="setnum" style="padding:7px 12px">변경</button>${G.numErr?`<span class="bad">${esc(G.numErr)}</span>`:'<span class="note">0~99 · 이적하거나 시즌 전에 바꿀 수 있습니다</span>'}</div>`;}
 function news(t,hot){G.news.unshift({y:G.year,t,hot:!!hot});if(G.news.length>160)G.news.length=160;}
 
 function newCareer(f){
@@ -534,7 +590,7 @@ function newCareer(f){
   if(f.trait==='grinder')for(const [k] of ks)pot[k]+=4;
   for(const [k] of ks){r[k]=clamp(r[k],20,80);pot[k]=clamp(pot[k],40,84);}
   G={v:2,style:f.style,stage:'hs',amateur:[],winter:null,winterNotes:[],name:f.name,school:f.school,type:f.type,pos:f.type==='B'?f.pos:'투수',trait:f.trait,throws:f.throws||'우투',
-    age:18,year:2026,team:-1,r,pot,career:[],awards:[],news:[],salary:0,fans:300,
+    age:18,year:2026,team:-1,r,pot,num:parseNum(f.num)??pick([1,2,5,7,8,10,11,13,17,18,19,21,22,24,25,27,29,33,36,47,51,52,53,61]),career:[],awards:[],news:[],salary:0,fans:300,
     oneGun:0,faClock:0,faNeed:8,faCount:0,exempt:false,served:false,service:0,postingDone:false,
     injRisk:1,lastWAR:0,role:'고교',phase:'hs',queue:[],last:null,tab:'season',pend:null,draft:null,contract:null};
   news(`${f.school} 3학년 ${G.pos} ${f.name}, 마지막 고교 시즌을 앞두다.`);
@@ -542,8 +598,8 @@ function newCareer(f){
 
 function decideRole(){
   if(G.service>0)return '상무';
-  const ov=overall()+clamp(G.lastWAR,-2,6)*1.3+rnd(-3,3);
-  if(G.type==='B')return ov>=56?'주전':ov>=48?'백업':'퓨처스';
+  let ov=overall()+clamp(G.lastWAR,-2,6)*1.3+rnd(-3,3);
+  if(G.type==='B'){if(G.lastPlus!=null)ov+=clamp((G.lastPlus-100)/12,-3,3);return ov>=56?'주전':ov>=48?'백업':'퓨처스';}
   if(G.ikseong){G.ikseong=false;return G.type==='B'?'퓨처스':'퓨처스';}
   if(G.type==='P'&&G.rolePref){const p=G.rolePref;if(p==='선발'&&ov>=50&&G.r.sta>=42)return '선발';if(p==='마무리'&&ov>=56)return '마무리';if(p==='불펜'&&ov>=46)return '불펜';}
   if(G.style==='workhorse'&&ov>=52)return '선발';
@@ -586,24 +642,32 @@ function simPit(lvl,role,inj,off){
   s.ERA=s.outs?s.ER*27/s.outs:0;s.WAR=lvl==='1군'?pitWAR(s,role):null;return s;
 }
 
-function teamSeason(myStr){
+function standings(myStr){
   const str=TEAMS.map((t,i)=>({i,v:rnd(-.06,.06)+(i===G.team?myStr:0)}));
   const ord=str.map(x=>({...x,k:x.v+rnd(-.03,.03)})).sort((a,b)=>b.k-a.k);
-  const wins={};ord.forEach((x,idx)=>{wins[x.i]=clamp(Math.round(72+x.v*260+rnd(-3,3)),48,95);});
-  ord.sort((a,b)=>wins[b.i]-wins[a.i]);
-  const rank=ord.findIndex(x=>x.i===G.team)+1;
-  const ser=(a,b,adv)=>chance(clamp(.5+(a.v-b.v)*2.5+adv,.22,.78));
-  const seed=ord.slice(0,5),stage=['와일드카드','준플레이오프','플레이오프','한국시리즈'],lost=[];
-  // 4위-5위 와일드카드(4위 어드밴티지) → 3위 준PO → 2위 PO → 1위 한국시리즈
-  let cur=ser(seed[3],seed[4],.12)?seed[3]:seed[4];
-  lost.push([cur===seed[3]?seed[4].i:seed[3].i,0]);
-  for(let s=1;s<=3;s++){const host=seed[3-s];const w=ser(host,cur,.05)?host:cur;lost.push([w===host?cur.i:host.i,s]);cur=w;}
-  const champ=cur.i;
-  let result;
+  ord.forEach(x=>{x.w=clamp(Math.round(72+x.v*260+rnd(-3,3)),48,95);});
+  ord.sort((a,b)=>b.w-a.w);
+  return ord.map(({i,v,w})=>({i,v,w}));
+}
+const PS_STAGE=['와일드카드 결정전','준플레이오프','플레이오프','한국시리즈'];
+const PS_GAME=['2차전','5차전','5차전','7차전'];
+const serWin=(a,b,adv)=>chance(clamp(.5+(a.v-b.v)*2.5+adv,.22,.78));
+// 4위-5위 와일드카드(4위 어드밴티지) → 3위 준PO → 2위 PO → 1위 한국시리즈. fixed[s]에 승자를 넣으면 그 시리즈는 고정
+function runPost(ord,fixed=[]){
+  const seed=ord.slice(0,5),games=[];
+  const res=(s,a,b,adv)=>fixed[s]!=null?(fixed[s]===a.i?a:b):(serWin(a,b,adv)?a:b);
+  let cur=res(0,seed[3],seed[4],.12);games.push({s:0,a:seed[3].i,b:seed[4].i,w:cur.i});
+  for(let s=1;s<=3;s++){const host=seed[3-s];const w=res(s,host,cur,.05);games.push({s,a:host.i,b:cur.i,w:w.i});cur=w;}
+  return games;
+}
+function tsFrom(ord,games){
+  const rank=ord.findIndex(x=>x.i===G.team)+1,table=ord.map(x=>({i:x.i,w:x.w}));
+  if(!games)games=runPost(ord);
+  const champ=games[3].w;let result;
   if(rank>5)result='가을야구 실패';
   else if(champ===G.team)result='한국시리즈 우승';
-  else{const l=lost.find(x=>x[0]===G.team);result=l?`${stage[l[1]]} 탈락`:'가을야구 진출';}
-  return {rank,result,champ,table:ord.map(x=>({i:x.i,w:wins[x.i]}))};
+  else{const l=games.find(g=>(g.a===G.team||g.b===G.team)&&g.w!==G.team);result=l?(l.s===3?'한국시리즈 준우승':`${PS_STAGE[l.s]} 탈락`):'가을야구 진출';}
+  return {rank,result,champ,table};
 }
 
 function seasonAwards(rec,firstYear){
@@ -614,7 +678,9 @@ function seasonAwards(rec,firstYear){
     return out;
   }
   if(rec.lvl!=='1군')return out;
-  const w=s.WAR,vote=m=>`득표율 ${Math.round(clamp(48+m*16+rnd(0,12),31,97))}%`;
+  // 투표 점수: 투수는 WAR, 타자는 WAR에 wRC+(타격 생산력)를 더해 기자단이 '방망이'도 보게 한다
+  const wr=G.type==='B'?wrcPlus(s):null;
+  const w=G.type==='B'&&wr&&s.PA>=300?s.WAR+clamp((wr.plus-100)/45,-1,1.8):s.WAR,vote=m=>`득표율 ${Math.round(clamp(48+m*16+rnd(0,12),31,97))}%`;
   if(G.type==='B'){
     const x=slash(s),q=s.PA>=446;
     if(q&&x.avg>rnd(.335,.36))add('타격왕',true,`타율 ${f3(x.avg)}`);
@@ -661,7 +727,7 @@ function simSeason(){
     }else{
       s=simPit(lvl,role,1-left*frac,1);
     }
-    recs.push({year:G.year,age:G.age,team:who==='상무'?'상무':team(G.team).s,lvl,role,s,inj:inj>0});
+    recs.push({year:G.year,age:G.age,team:who==='상무'?'상무':team(G.team).s,num:G.num,lvl,role,s,inj:inj>0});
   }
   return {recs,inj};
 }
@@ -673,34 +739,132 @@ function playSeason(){
   const war=main?main.s.WAR:0;
   const firstYear=main&&!G.career.some(c=>c.lvl==='1군');
   if(main&&!G.debut)G.debut=G.year;
-  const ts=teamSeason(main?war*.011:0);
   const awards=recs.flatMap(r=>{const a=seasonAwards(r,firstYear&&r===main);r.awards=a.filter(x=>x.won).map(x=>x.a);return a;});
   recs.forEach(r=>G.career.push(r));
+  G.cur={recs,inj,war,firstYear:!!firstYear,awards,main:!!main,ord:standings(main?war*.011:0),games:null,intl:null,clutch:[],step:'race'};
+  advanceSeason();
+}
+
+// ── 승부처: 시즌 중 중요한 경기에서 직접 선택한다 ──────────────────────────
+const INTL_OPP={아시안게임:['대만','일본'],올림픽:['일본','미국','도미니카공화국'],WBC:['일본','미국','대만','쿠바'],프리미어12:['대만','일본','멕시코','미국']};
+const INTL_GAME={아시안게임:'금메달 결정전',올림픽:'준결승',WBC:'8강전',프리미어12:'슈퍼라운드 결정전'};
+const intlKey=ev=>Object.keys(INTL_OPP).find(k=>ev.includes(k));
+function canClutch(){return G.cur.main&&G.role!=='퓨처스'&&G.role!=='상무';}
+function advanceSeason(){
+  const C=G.cur,T=G.team;
+  for(;;){
+    if(C.step==='race'){C.step='post';
+      const k=C.ord.findIndex(x=>x.i===T);
+      if(canClutch()&&(k===4||k===5)&&Math.abs(C.ord[4].w-C.ord[5].w)<=2){
+        const opp=C.ord[k===4?5:4].i;setMoment({kind:'race',opp,title:`${G.year} 정규시즌 최종전 · 5위 결정`,vs:team(opp).n,stakes:'이기면 가을야구 막차, 지면 시즌 끝'});return;}
+      continue;}
+    if(C.step==='post'){C.step='intl';
+      const rank=C.ord.findIndex(x=>x.i===T)+1;
+      if(rank>5){C.games=runPost(C.ord);continue;}
+      const nat=runPost(C.ord),lost=nat.find(g=>(g.a===T||g.b===T)&&g.w!==T);
+      const s=lost?lost.s:3;
+      // 한국시리즈는 늘, 탈락 위기는 가끔(주전급일수록 자주) 승부처가 찾아온다
+      const key=['주전','선발','마무리'].includes(G.role);
+      if(!canClutch()||(s<3&&!chance(key?.55:.3))){C.games=nat;continue;}
+      const g=nat[s],opp=g.a===T?g.b:g.a;
+      C.post={s,opp,prefix:nat.slice(0,s).map(x=>x.w)};
+      setMoment({kind:'post',s,opp,title:`${G.year} ${PS_STAGE[s]} ${PS_GAME[s]}`,vs:team(opp).n,stakes:s===3?'이기면 한국시리즈 우승':`지면 ${PS_STAGE[s]} 탈락`});return;}
+    if(C.step==='intl'){C.step='done';
+      const ev=INTL[G.year];
+      if(ev&&C.main){const ag=ev.includes('아시안게임');
+        if(C.war>=(ag?2.6:3.3)&&(!ag||G.age<=25||C.war>=5)){
+          const k=intlKey(ev);C.intl={ev};
+          setMoment({kind:'intl',ev,k,title:`${ev} ${INTL_GAME[k]}`,vs:pick(INTL_OPP[k]),stakes:k==='아시안게임'?(G.exempt||G.served?'금메달이 걸린 한 판':'금메달이면 병역 혜택'):k==='올림픽'?'이기면 결승, 메달이면 병역 혜택':'이기면 4강 진출'});return;}}
+      continue;}
+    finishSeason();return;
+  }
+}
+function scene(m){
+  const B=G.type==='B',bases=pick(['2루','1·2루','2·3루','만루','1·3루','3루']),outs=pick([0,1,1,2,2,2]);
+  const third=bases.includes('3')||bases==='만루';
+  if(B){const inn=pick([8,9,9,9]),diff=bases==='만루'||bases==='2·3루'?pick([-1,-2,0]):pick([-1,0]);
+    return {outs,third,bases,txt:`${inn}회${m.kind==='intl'?'':'말'} ${outs?outs+'사':'무사'} ${bases}, ${diff<0?`${-diff}점 뒤진`:'동점'} 상황. ${G.role==='백업'?'벤치에서 대타로 호출됐다. ':''}${m.vs} 마운드에는 상대 필승조가 서 있다.`};}
+  const r=G.role,inn=r==='선발'?pick([6,7]):r==='마무리'?9:pick([7,8]),lead=r==='마무리'?1:pick([0,1]);
+  return {outs,third,bases,txt:`${inn}회 ${outs?outs+'사':'무사'} ${bases} 위기, ${lead?'1점 앞선':'동점'} 상황. ${r==='선발'?'투구수는 이미 100개 가까이 됐다.':r==='마무리'?'9회를 막으러 올라왔다.':'불펜 문이 열리고 내 이름이 불렸다.'} 타석에는 ${m.vs}의 중심타자.`};
+}
+function clutchOpts(sc){
+  let o;
+  if(G.type==='B'){
+    o=[{k:'agg',n:'초구부터 노린다',d:'카운트 잡으러 들어오는 공을 놓치지 않는다',w:{con:.55,pow:.45},b:.44,h:.3},
+       {k:'pat',n:'끈질기게 볼카운트 싸움',d:'끝까지 보고 실투를 기다린다',w:{eye:.6,con:.4},b:.47,h:.1},
+       {k:'big',n:'한 방을 노린다',d:'풀스윙으로 장타를 노린다 · 터지면 영웅',w:{pow:.85,con:.15},b:.31,h:.6}];
+    if(sc.third&&sc.outs<2)o.push({k:'sf',n:'짧게 끊어 친다',d:'뜬공이든 땅볼이든 3루 주자를 불러들인다',w:{con:.6,spd:.4},b:.56,h:.05});
+  }else{
+    o=[{k:'fb',n:'직구로 정면 승부',d:`최고 ${velo()}km/h, 가장 자신 있는 공으로 윽박지른다`,w:{stf:1},b:.44,h:.35},
+       {k:'brk',n:'변화구로 유인',d:'존 밖으로 떨어지는 공으로 헛스윙을 끌어낸다',w:{brk:.8,ctl:.2},b:.45,h:.2},
+       {k:'ctl',n:'코너워크로 맞춰 잡는다',d:'보더라인 제구로 범타를 유도한다',w:{ctl:.8,brk:.2},b:.47,h:.1}];
+    if(G.role==='선발')o.push({k:'sta',n:'교체 없이 끝까지 간다',d:'불펜 대신 직접 위기를 막는다',w:{sta:.5,stf:.5},b:.4,h:.25});
+  }
+  const exp=clamp(((G.clutchW||0)-(G.clutchL||0))*.01,-.04,.06);
+  return o.map(x=>{const r=Object.entries(x.w).reduce((a,[k,v])=>a+G.r[k]*v,0);
+    return {...x,p:clamp(x.b+(r-55)*.014+exp,.1,.9),key:Object.keys(x.w).map(KN).join('·')};});
+}
+function setMoment(m){m.sc=scene(m);m.opts=clutchOpts(m.sc);G.moment=m;G.phase='clutch';news(`승부처: ${m.title} (vs ${m.vs})`);}
+const CL_TXT={
+ agg:{hero:['초구 직구를 그대로 걷어 올렸다. 담장을 넘어가는 역전 홈런!'],ok:['초구를 받아친 타구가 내야를 빠져나갔다. 주자 홈인!','카운트 잡으러 들어온 공을 놓치지 않았다. 결승 적시타!'],fail:['초구를 건드린 타구가 유격수 정면으로. 병살타…','성급했다. 2구 만에 내야 뜬공.']},
+ pat:{hero:['풀카운트 10구 승부 끝에 실투를 받아쳤다. 싹쓸이 2루타!'],ok:['풀카운트까지 끌고 간 끝에 밀어 친 타구가 외야에 떨어졌다. 적시타!','볼 세 개를 골라낸 뒤 들어온 직구를 정확히 맞혔다.'],fail:['끝까지 기다렸지만 바깥쪽 꽉 찬 공에 루킹 삼진.','풀카운트에서 떨어지는 공에 방망이가 나갔다. 헛스윙 삼진.']},
+ big:{hero:['풀스윙. 맞는 순간 모두가 알았다. 경기를 뒤집는 대형 홈런!'],ok:['힘껏 돌린 타구가 좌중간을 갈랐다. 역전 장타!'],fail:['크게 휘둘렀지만 헛스윙 삼진. 관중석에서 탄식이 터졌다.','큰 타구였지만 워닝트랙 앞에서 잡혔다.']},
+ sf:{hero:['짧게 끊어 친 타구가 전진 수비를 넘어갔다. 2타점 적시타!'],ok:['욕심을 버렸다. 희생플라이로 주자를 불러들였다.'],fail:['짧게 친 타구가 투수 앞으로. 3루 주자가 홈에서 아웃됐다.']},
+ fb:{hero:['직구 세 개로 헛스윙 삼진. 마운드에서 포효했다!'],ok:['직구로 밀어붙였다. 힘없는 내야 뜬공으로 위기 탈출.'],fail:['한가운데 몰린 직구가 그대로 담장을 넘어갔다.','직구가 공략당했다. 2타점 적시타를 맞았다.']},
+ brk:{hero:['떨어지는 변화구에 연속 헛스윙. 삼진으로 이닝 종료!'],ok:['유인구에 방망이가 나왔다. 땅볼 병살로 이닝 종료.'],fail:['변화구가 밋밋하게 들어갔다. 역전 적시타…','유인구를 다 참아냈다. 밀어내기 볼넷.']},
+ ctl:{hero:['양쪽 코너를 찌르는 공 4개로 루킹 삼진!'],ok:['바깥쪽 낮게 제구된 공으로 땅볼 유도. 위기 탈출.'],fail:['코너를 노리다 볼넷. 이어진 적시타에 리드를 내줬다.']},
+ sta:{hero:['투구수 110개를 넘겼지만 마지막 힘을 짜냈다. 삼진 두 개로 이닝 종료!'],ok:['끝까지 마운드를 지켰다. 실점 없이 이닝을 마쳤다.'],fail:['힘이 떨어졌다. 공이 높게 몰리며 역전 적시타.']}};
+function resolveClutch(idx){
+  const m=G.moment,o=m.opts[idx],C=G.cur,T=G.team;
+  const ok=chance(o.p),hero=ok&&chance(o.h),tier=hero?'영웅':ok?'성공':'실패';
+  let after='',big=1;
+  if(m.kind==='race'){
+    const me=C.ord.find(x=>x.i===T),op=C.ord.find(x=>x.i===m.opp),hi=Math.max(me.w,op.w);
+    const [wn,ls]=ok?[me,op]:[op,me];
+    C.ord[4]=wn;C.ord[5]=ls;wn.w=Math.min(hi+1,C.ord[3].w);ls.w=Math.min(ls.w,wn.w);
+    after=ok?'최종전 승리! 5위로 가을야구 막차를 탔다.':'최종전 패배. 6위로 시즌을 마쳤다.';big=1.5;
+  }else if(m.kind==='post'){
+    const fx=C.post.prefix.slice();fx[m.s]=ok?T:m.opp;C.games=runPost(C.ord,fx);
+    after=ok?(m.s===3?'한국시리즈 우승!':`${PS_STAGE[m.s]} 통과!`):(m.s===3?'한국시리즈 준우승.':`${PS_STAGE[m.s]} 탈락.`);big=2+m.s;
+    if(m.s===3&&ok&&(hero||chance(.3)))C.ksMvp=true;
+  }else{
+    const k=m.k;let res;
+    if(k==='아시안게임')res=ok?'금메달':'은메달';
+    else if(k==='올림픽')res=ok?(chance(.5)?'금메달':'은메달'):(chance(.45)?'동메달':'노메달');
+    else if(k==='WBC')res=ok?(chance(.3)?'우승':chance(.45)?'준우승':'4강'):'8강 탈락';
+    else res=ok?(chance(.35)?'우승':'준우승'):'슈퍼라운드 탈락';
+    C.intl.res=res;after=`${m.ev} 최종 결과: ${res}`;big=k==='아시안게임'&&!G.exempt&&!G.served?4:3;
+  }
+  const t=pick(CL_TXT[o.k][hero?'hero':ok?'ok':'fail']);
+  if(ok)G.clutchW=(G.clutchW||0)+1;else G.clutchL=(G.clutchL||0)+1;
+  G.fans+=ok?Math.round(ri(800,2000)*big*(hero?1.8:1)):ri(100,400);
+  const short=m.kind==='race'?'5위 결정전':m.kind==='post'?`${PS_STAGE[m.s]} ${PS_GAME[m.s]}`:`${m.ev} ${INTL_GAME[m.k]}`;
+  C.clutch.push({kind:m.kind,ok,hero,big,short,title:m.title,choice:o.n,txt:t,after});
+  news(`${short} 승부처, 「${o.n}」 → ${tier}. ${after}`,ok);
+  G.cres={title:m.title,vs:m.vs,choice:o.n,tier,txt:t,after};G.moment=null;G.phase='cres';
+}
+function finishSeason(){
+  const C=G.cur,{recs,inj,war,firstYear,awards}=C,main=recs.find(r=>r.lvl==='1군');
+  const ts=tsFrom(C.ord,C.games);
   const wonA=awards.filter(x=>x.won);
-  // news
+  if(C.ksMvp&&ts.champ===G.team){const a={a:'한국시리즈 MVP',won:true,note:'승부처의 주인공'};awards.push(a);wonA.push(a);if(main)main.awards.push(a.a);}
   if(inj)news(`부상으로 시즌 일부를 결장했다.`);
   for(const r of recs){
     if(r.lvl==='상무')news(`국군체육부대(상무)에서 퓨처스리그 ${r.s.G}경기 출전.`);
     else if(r.lvl==='퓨처스')news(`퓨처스리그에서 ${r.s.G}경기를 소화하며 1군 콜업을 기다렸다.`);
   }
   if(firstYear)news(`${team(G.team).n} 유니폼을 입고 1군 데뷔!`,true);
+  if(main&&G.type==='B'){const wr=wrcPlus(main.s);if(wr&&main.s.PA>=150)news(`시즌 wRC+ ${wr.plus} (리그 평균 100).`);}
   wonA.forEach(x=>{G.awards.push({y:G.year,a:x.a});news(`${x.a} 수상! (${x.note})`,true);});
-  if(ts.result==='한국시리즈 우승'){G.awards.push({y:G.year,a:'한국시리즈 우승'});news(`${team(G.team).n} 한국시리즈 우승! 잠실/홈구장이 열광했다.`,true);}
+  if(ts.result==='한국시리즈 우승'){G.awards.push({y:G.year,a:'한국시리즈 우승'});news(`${team(G.team).n} 한국시리즈 우승! 홈구장이 열광했다.`,true);}
   else news(`${team(G.team).n} 정규시즌 ${ts.rank}위 · ${ts.result}.`);
   // international
   let intl=null;
-  const ev=INTL[G.year];
-  if(ev&&main){
-    const ag=ev.includes('아시안게임');
-    const ok=war>=(ag?2.6:3.3)&&(!ag||G.age<=25||war>=5);
-    if(ok){
-      let res;
-      if(ag){res=chance(.72)?'금메달':chance(.6)?'은메달':'동메달';if(res==='금메달'&&!G.exempt&&!G.served){G.exempt=true;news(`아시안게임 금메달로 병역 혜택을 받았다.`,true);}}
-      else if(ev.includes('올림픽')){res=chance(.22)?'금메달':chance(.35)?'동메달':'노메달';if(res!=='노메달'&&!G.exempt&&!G.served){G.exempt=true;news(`올림픽 메달로 병역 혜택을 받았다.`,true);}}
-      else res=chance(.14)?'우승':chance(.3)?'4강':'조별 탈락';
-      intl={ev,res};G.awards.push({y:G.year,a:`${ev} 국가대표 (${res})`});news(`${ev} 국가대표 발탁 · 결과: ${res}`,true);
-      G.fans+=Math.round(3000+war*1500);
-    }
+  if(C.intl&&C.intl.res){
+    const {ev,res}=C.intl;intl={ev,res};
+    if(((ev.includes('아시안게임')&&res==='금메달')||(ev.includes('올림픽')&&res!=='노메달'))&&!G.exempt&&!G.served){G.exempt=true;news(`${ev} ${res}로 병역 혜택을 받았다.`,true);}
+    G.awards.push({y:G.year,a:`${ev} 국가대표 (${res})`});news(`${ev} 국가대표 · 결과: ${res}`,true);
+    G.fans+=Math.round(3000+war*1500);
   }
   // fans, salary, clocks
   G.fans=Math.round(G.fans*(main?1.05:1)+(main?Math.max(0,war)*2200:150)+wonA.length*5000);
@@ -712,8 +876,9 @@ function playSeason(){
   if(G.contract){G.contract.left--;}
   if(G.service>0){G.service--;if(G.service===0){G.served=true;news('상무 복무를 마치고 전역했다.',true);}}
   G.lastWAR=main?war:-0.5;
-  G.last={recs,ts,awards,intl,inj,firstYear:!!firstYear};G.last.sns=seasonSNS(G.last);G.preSNS=null;
-  G.phase='post';
+  G.lastPlus=null;if(main&&G.type==='B'){const wr=wrcPlus(main.s);if(wr&&main.s.PA>=150)G.lastPlus=wr.plus;}
+  G.last={recs,ts,awards,intl,inj,firstYear,clutch:C.clutch};G.last.sns=seasonSNS(G.last);G.preSNS=null;
+  G.cur=null;G.phase='post';
 }
 
 // 오프시즌 단계 · 훈련은 결과 폭(안정/보통/도박)에 따라 대박~실패가 확률로 갈린다
@@ -898,7 +1063,7 @@ function chipFor(i){const t=team(i);return `<span class="chip" style="background
 function save(){try{localStorage.setItem('kbo-futures-v1',JSON.stringify(G));}catch(e){}}
 function load(){try{const s=localStorage.getItem('kbo-futures-v1');if(s)return JSON.parse(s);}catch(e){}return null;}
 
-let form={name:'',school:'덕수고',type:'B',pos:'유격수',trait:'grinder',style:'contact',throws:'우투우타'};
+let form={num:'',name:'',school:'덕수고',type:'B',pos:'유격수',trait:'grinder',style:'contact',throws:'우투우타'};
 const THROWS={B:['우투우타','우투좌타','좌투좌타','우투양타'],P:['우완 정통파','좌완','우완 사이드암','우완 언더핸드']};
 let confirmReset=false;
 
@@ -911,7 +1076,7 @@ function playerCard(){
   const cnt={};top.forEach(a=>cnt[a.a]=(cnt[a.a]||0)+1);
   return `<aside class="card pcard">
     <div class="row">${G.team>=0?chipFor(G.team):`<span class="pill">${esc(G.stage==='college'?G.college.name:G.school)}</span>`}<span class="pill">${esc(G.role)}</span></div>
-    <div><div class="pname">${esc(G.name)}</div><div class="meta">${G.year}년 · 만 ${G.age}세 · ${esc(G.throws)} ${esc(G.pos)} · ${(G.type==='B'?BAT_TYPES:PIT_TYPES)[G.style].n} · ${TRAITS[G.trait].n}</div></div>
+    <div><div class="pname"><span class="jno" title="등번호">${G.num}</span>${esc(G.name)}</div><div class="meta">${G.year}년 · 만 ${G.age}세 · ${esc(G.throws)} ${esc(G.pos)} · ${(G.type==='B'?BAT_TYPES:PIT_TYPES)[G.style].n} · ${TRAITS[G.trait].n}</div></div>
     <div class="ratings"><div class="lbl">스카우팅 등급 (20-80)</div>
       ${ks.map(([k,n])=>{const v=Math.round(G.r[k]);return `<div class="rt"><span>${n}</span><div class="bar"><i class="${v>=60?'hi':''}" style="width:${(v-20)/65*100}%"></i></div><span class="num">${v}</span><span class="grade">${grade(v)}</span></div>`;}).join('')}
       <div class="rt"><b>종합</b><div class="bar"><i class="hi" style="width:${(ov-20)/65*100}%"></i></div><b class="num">${Math.round(ov)}</b><span class="grade">${grade(ov)}</span></div>
@@ -935,7 +1100,7 @@ function statLine(r){
   if(G.type==='B'){const x=slash(s),w=s.WAR!=null?wrcPlus(s):null;
     return `<div class="line">
       <div><small>타율</small>${cv(x.avg,3)}</div><div><small>출루율</small>${cv(x.obp,3)}</div><div><small>장타율</small>${cv(x.slg,3)}</div><div><small>OPS</small>${cv(x.ops,3)}</div>
-      ${w?`<div><small>wRC</small>${cv(w.wrc,0)}</div>`:''}
+      ${w?`<div><small>wRC+</small>${cv(w.plus,0)}</div><div><small>wRC</small>${cv(w.wrc,0)}</div>`:''}
       <div><small>홈런</small>${cv(s.HR,0)}</div><div><small>타점</small>${cv(s.RBI,0)}</div><div><small>도루</small>${cv(s.SB,0)}</div><div><small>경기 / 타석</small><b>${s.G} / ${s.PA}</b></div>
       ${s.WAR!=null?`<div><small>WAR</small>${cv(s.WAR,1)}</div>`:''}</div>`;}
   return `<div class="line">
@@ -945,13 +1110,13 @@ function statLine(r){
     <div><small>경기</small><b>${s.G}</b></div>${s.WAR!=null?`<div><small>WAR</small>${cv(s.WAR,1)}</div>`:''}</div>`;
 }
 function snsFeed(f,base){
-  if(!f||f.v!==2)return '';let i=base+1;const I=()=>i++;
+  if(!f||f.v<2)return '';let i=base+1;const I=()=>i++;
   const parts=[];
   if(f.nv)parts.push(`<article class="post p-nv rv" style="--i:${I()}"><span class="ptag">네이버 스포츠 · 기사 댓글</span><b class="head">${esc(f.nv.head)}</b>
-    ${f.nv.cm.map((c,k)=>`<div class="cmt"><span class="who">${k===0?'<span class="best">BEST</span> ':''}${esc(c.who)}</span><span>${esc(c.t)}</span><span class="meta">답글 ${c.rp} · 공감 ${c.up.toLocaleString()} · 비공감 ${c.dn.toLocaleString()}</span></div>`).join('')}</article>`);
+    ${f.nv.cm.map((c,k)=>`<div class="cmt"><span class="who">${k===0&&c.up>=10?'<span class="best">BEST</span> ':''}${esc(c.who)}</span><span>${esc(c.t)}</span><span class="meta">답글 ${c.rp} · 공감 ${c.up.toLocaleString()} · 비공감 ${c.dn.toLocaleString()}</span></div>`).join('')}</article>`);
   if(f.dc.length)parts.push(`<article class="post p-dc rv" style="--i:${I()}"><span class="ptag">디시인사이드 · ${esc(f.gal||'국내야구')} 갤러리</span>
-    <ul class="gal">${f.dc.map(d=>`<li><span><span class="hd">[일반]</span> ${esc(d.t)} <span class="cc">[${d.cm}]</span></span><span class="meta">${esc(d.who)} · 추천 ${d.rec.toLocaleString()}</span>${d.rp?`<span class="rp">ㄴ ${esc(d.rp)}</span>`:''}</li>`).join('')}</ul></article>`);
-  f.x.forEach(t=>parts.push(`<article class="post p-x rv" style="--i:${I()}"><span class="ptag">X (트위터)</span><span>${esc(t.t)}</span><span class="who">${esc(t.who)}</span><span class="meta">♥ ${t.like.toLocaleString()} · 재게시 ${t.rt.toLocaleString()}</span></article>`));
+    <ul class="gal">${f.dc.map(d=>{const rps=Array.isArray(d.rp)?d.rp:d.rp?[d.rp]:[];return `<li><span><span class="hd">[${esc(d.h||'일반')}]</span> ${esc(d.t)}${d.cm?` <span class="cc">[${d.cm}]</span>`:''}${d.best?' <span class="best gn">개념글</span>':''}</span><span class="meta">${esc(d.who)} · 추천 ${d.rec.toLocaleString()}</span>${rps.map(r=>`<span class="rp">ㄴ ${esc(r)}</span>`).join('')}</li>`;}).join('')}</ul></article>`);
+  f.x.forEach(t=>parts.push(`<article class="post p-x rv" style="--i:${I()}"><span class="ptag">X (트위터)</span><span>${esc(t.t)}</span><span class="who">${esc(t.who)}</span><span class="meta">${t.rpl!=null?`답글 ${t.rpl.toLocaleString()} · `:''}재게시 ${t.rt.toLocaleString()} · ♥ ${t.like.toLocaleString()}</span></article>`));
   if(f.cafe.length)parts.push(`<article class="post p-cafe rv" style="--i:${I()}"><span class="ptag">네이버 카페 · ${esc(f.cafeName)}</span>
     ${f.cafe.map(c=>`<div class="cmt"><b>${esc(c.t)}</b><span class="note">${esc(c.pv)}</span><span class="meta">조회 ${c.v.toLocaleString()} · 댓글 ${c.cm}</span></div>`).join('')}</article>`);
   return `<div class="stack" style="gap:8px"><h3 class="rv" style="--i:${base}">SNS 반응</h3><div class="feed">${parts.join('')}</div><p class="note">게임 속 가상의 반응입니다.</p></div>`;
@@ -980,6 +1145,7 @@ function phasePanel(){
       :`<p>어느 구단의 부름도 받지 못했다. ${hs?'대학에서 4년을 더 다듬거나, ':''}육성선수로 프로의 문을 두드릴 수 있다.</p>`}
     ${hs?`<p class="note">대학에 가면 4년간 U-리그에서 뛰며 성장한 뒤 다시 드래프트에 나갑니다. 데뷔는 늦어지지만 FA 자격은 1시즌 빠른 7시즌에 얻습니다.</p>`:''}
     ${snsFeed(d.sns,5)}
+    ${d.round?numBox():''}
     <div class="row">${btns}</div></section>`;}
   if(P==='col')return `<section class="card stack fade"><div class="lbl">${G.year} · ${esc(G.college.name)} ${G.college.yr}학년</div><h2>대학야구 U-리그 시즌</h2>
     ${winterBox()}
@@ -1001,6 +1167,7 @@ function phasePanel(){
       <div class="row"><span class="pill">보직: ${esc(G.role)}</span>${G.injRisk>3?'<span class="pill">재활 중</span>':''}</div>
       ${winterBox()}
       <p>${desc}</p>
+      ${numBox()}
       ${G.preSNS?snsFeed(G.preSNS,1):''}
       <div class="row"><button class="btn" data-act="season">${G.year} 시즌 시작</button>${G.age>=33?'<button class="btn sec" data-act="retireAsk">은퇴 선언</button>':''}</div>
       ${G.retireAsk?`<div class="callout">정말 은퇴할까요? 되돌릴 수 없습니다. <button class="btn" data-act="retireYes" style="margin-left:8px">은퇴한다</button></div>`:''}
@@ -1011,11 +1178,26 @@ function phasePanel(){
       <h2 class="stamp" style="--i:${n()}">${esc(team(G.team).s)} 정규시즌 ${L.ts.rank}위 · ${esc(L.ts.result)}</h2>
       <div class="stand rv" style="--i:${n()}">${L.ts.table.map((x,k)=>`<div class="${x.i===G.team?'me':''}"><span class="num">${k+1}</span>${esc(team(x.i).s)}<span class="num" style="margin-left:auto">${x.w}승</span></div>`).join('')}</div>
       <p class="note rv" style="--i:${n()}">한국시리즈 우승: ${esc(team(L.ts.champ).n)}</p>
+      ${(L.clutch||[]).length?`<div class="stack rv" style="gap:6px;--i:${n()}"><h3>승부처</h3>${L.clutch.map(c=>`<p class="note"><b class="${c.ok?'good':'bad'}">${c.hero?'영웅':c.ok?'성공':'실패'}</b> · ${esc(c.short)} · 「${esc(c.choice)}」 ${esc(c.txt)}</p>`).join('')}</div>`:''}
       ${L.recs.map(r=>`<div class="stack rv" style="gap:8px;--i:${n()}"><h3>${r.lvl==='1군'?`1군 · ${esc(r.role)}`:r.lvl==='상무'?'상무 (퓨처스리그)':'퓨처스리그'}${r.inj?' <span class="pill">부상 결장</span>':''}</h3>${statLine(r)}</div>`).join('')}
       <div class="stack" style="gap:8px"><h3 class="rv" style="--i:${n()}">${G.year} KBO 시상식</h3>
       ${aw.length||L.intl?`<ul class="awards">${aw.map(x=>`<li class="${x.won?'':'miss'} rv" style="--i:${n()}"><span class="${x.won?'badge stamp':'pill2'}" style="--i:${i}">${x.won?'수상':'후보'}</span><b>${esc(x.a)}</b><span class="note">${esc(x.note)}</span></li>`).join('')}${L.intl?`<li class="rv" style="--i:${n()}"><span class="badge">대표</span><b>${esc(L.intl.ev)} 국가대표</b><span class="note">${esc(L.intl.res)}</span></li>`:''}</ul>`:`<p class="note rv" style="--i:${n()}">이번 시즌은 수상 후보에 오르지 못했다.</p>`}</div>
       ${snsFeed(L.sns,(i+=1))}
       <div class="rv" style="--i:${i+snsCount(L.sns)+1}"><button class="btn" data-act="off">오프시즌으로</button></div></section>`;}
+  if(P==='clutch'){const m=G.moment,pc=p=>Math.round(p*20)*5;
+    return `<section class="card stack fade"><div class="lbl rv" style="--i:0">승부처 · ${esc(m.title)}</div>
+      <h2 class="rv" style="--i:1">vs ${esc(m.vs)} · ${esc(m.stakes)}</h2>
+      <div class="callout rv" style="--i:2">${esc(m.sc.txt)}</div>
+      <p class="rv" style="--i:3">${G.type==='B'?'어떻게 칠까?':'어떻게 승부할까?'}</p>
+      <div class="opts">${m.opts.map((o,k)=>`<button class="opt rv" style="--i:${4+k}" data-act="clutch" data-v="${k}"><b>${esc(o.n)}</b><span>${esc(o.d)}</span><span class="vol ${o.p>=.55?'v-안정':o.p>=.4?'v-보통':'v-도박'}">성공 확률 약 ${pc(o.p)}% · ${esc(o.key)}${o.h>=.3?' · 크게 터질 수 있음':''}</span></button>`).join('')}</div>
+      <p class="note">성공 확률은 현재 능력치로 계산됩니다. 큰 경기 경험(승부처 성적)이 쌓이면 조금씩 유리해집니다.${G.clutchW||G.clutchL?` 지금까지 승부처 ${G.clutchW||0}승 ${G.clutchL||0}패.`:''}</p></section>`;}
+  if(P==='cres'){const t=G.cres;
+    return `<section class="card stack fade"><div class="lbl">결과 · ${esc(t.title)}</div>
+      <p class="note">「${esc(t.choice)}」</p><p class="note drum">숨죽인 관중석…</p>
+      <h2 class="tier t-${t.tier} stamp" style="--i:4">${t.tier}</h2>
+      <p class="rv" style="--i:5">${esc(t.txt)}</p>
+      <div class="callout rv" style="--i:6"><b>${esc(t.after)}</b></div>
+      <div class="rv" style="--i:7"><button class="btn" data-act="cnext">계속</button></div></section>`;}
   if(P==='meet')return `<section class="card stack fade"><div class="lbl rv" style="--i:0">오프시즌 · 감독 면담</div><h2 class="rv" style="--i:1">감독실로 불려갔다</h2><p class="rv" style="--i:2">${esc(meetLine())}</p>
       <div class="opts">${G.pend.map((o,k)=>`<button class="opt rv" style="--i:${3+k}" data-act="meet" data-v="${k}"><b>${esc(o.n)}</b><span>${esc(o.d)}</span></button>`).join('')}</div>
       ${G.type==='P'&&G.rolePref?`<p class="note">현재 요청한 보직: ${esc(G.rolePref)}</p>`:''}</section>`;
@@ -1052,14 +1234,14 @@ function endPanel(){
   const mainTeam=(()=>{const c={};G.career.filter(r=>r.lvl==='1군').forEach(r=>c[r.team]=(c[r.team]||0)+r.s.WAR);return Object.entries(c).sort((a,b)=>b[1]-a[1])[0];})();
   let verdict;const fr=franchise(),frName=fr?(TEAMS.find(x=>x.s===fr.team)||{n:fr.team}).n:'';
   if(G.retireReason==='mlb')verdict=`메이저리그 포스팅으로 태평양을 건넜다. KBO 통산 WAR ${f1(war)}.`;
-  else if(fr&&fr.retired)verdict=`KBO의 전설. ${frName}${josa(frName,'이','가')} 등번호를 영구결번했다.`;
+  else if(fr&&fr.retired)verdict=`KBO의 전설. ${frName}${josa(frName,'이','가')} 등번호 ${fr.num}번을 영구결번했다.`;
   else if(fr&&fr.score>=FR_LINE-15&&war>=45)verdict='영구결번 문턱에서 아쉽게 멈춘 슈퍼스타. 은퇴식에 만원 관중이 모였다.';
   else if(war>=40)verdict='한 시대를 대표한 스타. 은퇴식에 만원 관중이 모였다.';
   else if(war>=20)verdict='꾸준함으로 오래 사랑받은 주축 선수.';
   else if(war>=5)verdict='팀에 꼭 필요했던 쏠쏠한 선수.';
   else if(t.seasons)verdict='짧았지만 1군 무대를 밟아본 선수.';
   else verdict='끝내 1군의 벽을 넘지 못했다. 그래도 퓨처스에서 흘린 땀은 진짜였다.';
-  if(!G.endSNS)G.endSNS=makeSNS([G.retireReason==='mlb'?'mlb':fr&&fr.retired?'legend':'retire','retire'],snsCtx({team:frName||(G.team>=0?team(G.team).n:''),ts:fr?fr.team:''}));
+  if(!G.endSNS)G.endSNS=makeSNS([G.retireReason==='mlb'?'mlb':fr&&fr.retired?'legend':'retire','retire'],snsCtx({team:frName||(G.team>=0?team(G.team).n:''),ts:fr?fr.team:'',num:fr?fr.num:G.num}));
   const line=G.type==='B'&&t.PA?`${f3(t.H/t.AB)} · ${t.HR}홈런 · ${t.RBI}타점 · ${t.SB}도루 · ${t.H}안타`:G.type==='P'&&t.outs?`${t.W}승 ${t.L}패 ${t.SV?t.SV+'세이브 ':''}${t.HLD?t.HLD+'홀드 ':''}· 평균자책점 ${f2(t.ERA)} · ${ipStr(t.outs)}이닝 · ${t.SO}탈삼진`:'1군 기록 없음';
   return `<section class="card stack fade"><div class="lbl">${G.retireReason==='mlb'?'KBO 커리어 종료':'현역 은퇴'} · ${G.year}</div>
     <h2 class="stamp" style="--i:1">${esc(verdict)}</h2>
@@ -1076,6 +1258,7 @@ function newForm(){
     <p>고교 마지막 시즌을 치르고 KBO 신인드래프트에 나갑니다. 프로로 직행할지, 대학에서 4년을 더 다듬을지는 드래프트 결과를 보고 정합니다. 퓨처스리그에서 시작해 1군 주전, 국가대표, FA 대박, 영구결번까지 커리어를 만들어 보세요.</p>
     <div class="form">
       <div class="field"><label class="lbl" for="fName">이름</label><input id="fName" maxlength="8" value="${esc(form.name)}" placeholder="예: 김도윤"></div>
+      <div class="field"><label class="lbl" for="fNum">등번호</label><input id="fNum" type="number" min="0" max="99" inputmode="numeric" value="${esc(form.num)}" placeholder="0~99 · 비우면 자동"></div>
       <div class="field"><label class="lbl" for="fSchool">출신 고교</label><select id="fSchool">${SCHOOLS.map(s=>`<option ${s===form.school?'selected':''}>${s}</option>`).join('')}</select></div>
       <div class="field"><label class="lbl" for="fType">유형</label><select id="fType"><option value="B" ${form.type==='B'?'selected':''}>타자</option><option value="P" ${form.type==='P'?'selected':''}>투수</option></select></div>
       <div class="field"><label class="lbl" for="fThrows">${form.type==='B'?'투타':'투구 폼'}</label><select id="fThrows">${THROWS[form.type].map(s=>`<option ${s===form.throws?'selected':''}>${s}</option>`).join('')}</select></div>
@@ -1094,13 +1277,13 @@ function careerTable(){
   const rows=[...(G.amateur||[]),...G.career];
   const LV={'고교':' (고교)','대학':' (대학)','퓨처스':' (2군)','상무':' (2군)'};
   if(G.type==='B'){
-    const head=`<tr><th class="l">연도</th><th>나이</th><th class="l">소속</th><th>G</th><th>PA</th><th>AVG</th><th>OBP</th><th>SLG</th><th>OPS</th><th>wOBA</th><th>wRC</th><th>H</th><th>2B</th><th>HR</th><th>RBI</th><th>R</th><th>SB</th><th>BB</th><th>SO</th><th>WAR</th><th class="l">수상</th></tr>`;
-    const tr=(r,cls,lab)=>{const s=r.s,x=slash(s),w=(r.lvl==='1군'||cls==='tot')?wrcPlus(s):null;return `<tr class="${cls}"><td class="l">${lab||r.year}</td><td>${r.age??''}</td><td class="l">${esc(r.team??'')}${LV[r.lvl]||''}</td><td>${s.G}</td><td>${s.PA}</td><td>${f3(x.avg)}</td><td>${f3(x.obp)}</td><td>${f3(x.slg)}</td><td>${f3(x.ops)}</td><td>${w?f3(w.woba):'-'}</td><td>${w?w.wrc:'-'}</td><td>${s.H}</td><td>${s.D}</td><td>${s.HR}</td><td>${s.RBI}</td><td>${s.R}</td><td>${s.SB}</td><td>${s.BB}</td><td>${s.SO}</td><td>${s.WAR==null?'-':f1(s.WAR)}</td><td class="l">${esc((r.awards||[]).join(', '))}</td></tr>`;};
+    const head=`<tr><th class="l">연도</th><th>나이</th><th class="l">소속</th><th>No.</th><th>G</th><th>PA</th><th>AVG</th><th>OBP</th><th>SLG</th><th>OPS</th><th>wOBA</th><th>wRC</th><th>wRC+</th><th>H</th><th>2B</th><th>HR</th><th>RBI</th><th>R</th><th>SB</th><th>BB</th><th>SO</th><th>WAR</th><th class="l">수상</th></tr>`;
+    const tr=(r,cls,lab)=>{const s=r.s,x=slash(s),w=(r.lvl==='1군'||cls==='tot')?wrcPlus(s):null;return `<tr class="${cls}"><td class="l">${lab||r.year}</td><td>${r.age??''}</td><td class="l">${esc(r.team??'')}${LV[r.lvl]||''}</td><td>${r.num??''}</td><td>${s.G}</td><td>${s.PA}</td><td>${f3(x.avg)}</td><td>${f3(x.obp)}</td><td>${f3(x.slg)}</td><td>${f3(x.ops)}</td><td>${w?f3(w.woba):'-'}</td><td>${w?w.wrc:'-'}</td><td>${w?w.plus:'-'}</td><td>${s.H}</td><td>${s.D}</td><td>${s.HR}</td><td>${s.RBI}</td><td>${s.R}</td><td>${s.SB}</td><td>${s.BB}</td><td>${s.SO}</td><td>${s.WAR==null?'-':f1(s.WAR)}</td><td class="l">${esc((r.awards||[]).join(', '))}</td></tr>`;};
     const t=careerTotals();
     return `<div class="tbl"><table><thead>${head}</thead><tbody>${rows.map(r=>tr(r,r.lvl==='1군'?'':'fut')).join('')}${t.PA?tr({s:t},'tot','1군 통산'):''}</tbody></table></div>`;
   }
-  const head=`<tr><th class="l">연도</th><th>나이</th><th class="l">소속</th><th>G</th><th>GS</th><th>W</th><th>L</th><th>SV</th><th>HLD</th><th>IP</th><th>ERA</th><th>FIP</th><th>WHIP</th><th>SO</th><th>BB</th><th>HR</th><th>WAR</th><th class="l">수상</th></tr>`;
-  const tr=(r,cls,lab)=>{const s=r.s;return `<tr class="${cls}"><td class="l">${lab||r.year}</td><td>${r.age??''}</td><td class="l">${esc(r.team??'')}${LV[r.lvl]||''}</td><td>${s.G}</td><td>${s.GS}</td><td>${s.W}</td><td>${s.L}</td><td>${s.SV}</td><td>${s.HLD}</td><td>${ipStr(s.outs)}</td><td>${f2(s.ER*27/s.outs)}</td><td>${(r.lvl==='1군'||cls==='tot')?f2(fipOf(s)):'-'}</td><td>${f2((s.H+s.BB)/(s.outs/3))}</td><td>${s.SO}</td><td>${s.BB}</td><td>${s.HR}</td><td>${s.WAR==null?'-':f1(s.WAR)}</td><td class="l">${esc((r.awards||[]).join(', '))}</td></tr>`;};
+  const head=`<tr><th class="l">연도</th><th>나이</th><th class="l">소속</th><th>No.</th><th>G</th><th>GS</th><th>W</th><th>L</th><th>SV</th><th>HLD</th><th>IP</th><th>ERA</th><th>FIP</th><th>WHIP</th><th>SO</th><th>BB</th><th>HR</th><th>WAR</th><th class="l">수상</th></tr>`;
+  const tr=(r,cls,lab)=>{const s=r.s;return `<tr class="${cls}"><td class="l">${lab||r.year}</td><td>${r.age??''}</td><td class="l">${esc(r.team??'')}${LV[r.lvl]||''}</td><td>${r.num??''}</td><td>${s.G}</td><td>${s.GS}</td><td>${s.W}</td><td>${s.L}</td><td>${s.SV}</td><td>${s.HLD}</td><td>${ipStr(s.outs)}</td><td>${f2(s.ER*27/s.outs)}</td><td>${(r.lvl==='1군'||cls==='tot')?f2(fipOf(s)):'-'}</td><td>${f2((s.H+s.BB)/(s.outs/3))}</td><td>${s.SO}</td><td>${s.BB}</td><td>${s.HR}</td><td>${s.WAR==null?'-':f1(s.WAR)}</td><td class="l">${esc((r.awards||[]).join(', '))}</td></tr>`;};
   const t=careerTotals();
   return `<div class="tbl"><table><thead>${head}</thead><tbody>${rows.map(r=>tr(r,r.lvl==='1군'?'':'fut')).join('')}${t.outs?tr({s:t},'tot','1군 통산'):''}</tbody></table></div>`;
 }
@@ -1111,7 +1294,7 @@ function lowerPanel(){
   return `<section class="card stack"><div class="tabs" role="tablist">
       <button class="tab ${tab==='season'?'on':''}" data-act="tab" data-v="season" role="tab">커리어 기록</button>
       <button class="tab ${tab==='news'?'on':''}" data-act="tab" data-v="news" role="tab">뉴스</button></div>
-    ${tab==='season'?careerTable()+`<p class="note">회색 행은 아마추어(고교·대학)와 퓨처스리그(2군·상무) 기록이며 WAR·wOBA·wRC·FIP는 1군 기록에만 계산합니다. wRC는 타격으로 만든 득점 기여(점)로, 600타석 리그 평균 타자가 약 73점입니다. 리그 평균은 1군 주전급(능력치 55) 기준 타율 .260 안팎, 평균자책점 4점대 초중반으로 맞춰져 있습니다.</p>`
+    ${tab==='season'?careerTable()+`<p class="note">회색 행은 아마추어(고교·대학)와 퓨처스리그(2군·상무) 기록이며 WAR·wOBA·wRC·FIP는 1군 기록에만 계산합니다. wRC는 타격으로 만든 득점 기여(점)로 600타석 리그 평균 타자가 약 73점이고, wRC+는 이를 리그 평균 100 기준으로 환산한 값입니다(120이면 평균보다 20% 더 생산). wRC+는 시상식 투표와 다음 시즌 주전 경쟁에도 반영됩니다. 리그 평균은 1군 주전급(능력치 55) 기준 타율 .260 안팎, 평균자책점 4점대 초중반으로 맞춰져 있습니다.</p>`
       :`<ul class="news">${G.news.map(n=>`<li><span class="y">${n.y}</span><span class="${n.hot?'hot':''}">${esc(n.t)}</span></li>`).join('')}</ul>`}
   </section>`;
 }
@@ -1136,6 +1319,7 @@ function render(){
 
 app.addEventListener('input',e=>{
   if(e.target.id==='fName')form.name=e.target.value;
+  if(e.target.id==='fNum')form.num=e.target.value;
 });
 app.addEventListener('change',e=>{
   const id=e.target.id;
@@ -1170,19 +1354,22 @@ document.addEventListener('click',e=>{
       const oldT=team(G.prevTeam??o.i);news(`FA ${moved?'이적':'잔류'}: ${team(o.i).n}와 ${o.yrs}년 총액 ${won(o.tot)} 계약.`,true);G.preSNS=makeSNS([moved?'fa_move':'fa_stay'],snsCtx({money:`${o.yrs}년 ${won(o.tot)}`,cafe:oldT.n})); G.fans+=moved?2000:4000; nextStep(); break; }
     case 'ev': applyEvent(v); nextStep(); break;
     case 'train': applyTrain(G.pend[+v]); break;
+    case 'clutch': resolveClutch(+v); break;
+    case 'setnum': { const n=parseNum((document.getElementById('jNum')||{}).value); if(n==null){G.numErr='0~99 사이 숫자를 입력하세요.';} else {G.numErr=null; if(n!==G.num){news(`등번호를 ${G.num}번에서 ${n}번으로 바꿨다.`);G.num=n;}} break; }
+    case 'cnext': G.cres=null; advanceSeason(); break;
     case 'retireAsk': G.retireAsk=true; break;
     case 'retireYes': G.retireAsk=false; retire('self'); break;
     case 'tab': G.tab=v; break;
     default: return;
   }
-  anim=['hs','sign','ik','college','colseason','coloff','season','train','meet','post','retireYes','fa'].includes(a);
+  anim=['hs','sign','ik','college','colseason','coloff','season','train','meet','post','retireYes','fa','clutch','cnext'].includes(a);
   render();
-  if(['hs','sign','ik','college','colseason','coloff','tnext','season','off','mil','post','fa','ev','train','create','meet'].includes(a))window.scrollTo({top:0,behavior:'smooth'});
+  if(['hs','sign','ik','college','colseason','coloff','tnext','season','off','mil','post','fa','ev','train','create','meet','clutch','cnext'].includes(a))window.scrollTo({top:0,behavior:'smooth'});
 });
 
 G=load();
 if(G&&G.v!==2&&G.v!==3)G=null;
-if(G){if(G.last&&Array.isArray(G.last.sns))G.last.sns=null;if(Array.isArray(G.preSNS))G.preSNS=null;if(Array.isArray(G.endSNS))G.endSNS=null;if(G.draft&&Array.isArray(G.draft.sns))G.draft.sns=null;}
+if(G){if(G.num==null)G.num=ri(1,99);if(G.last&&Array.isArray(G.last.sns))G.last.sns=null;if(Array.isArray(G.preSNS))G.preSNS=null;if(Array.isArray(G.endSNS))G.endSNS=null;if(G.draft&&Array.isArray(G.draft.sns))G.draft.sns=null;}
 render();
 // UI END
 </script>

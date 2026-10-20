@@ -110,6 +110,10 @@ tr.tot td{font-weight:600;background:var(--sunk)}
 .best.gn{color:var(--sns-dc);border-color:var(--sns-dc)}
 .tlogo{height:18px;width:18px;object-fit:contain;background:#fff;border-radius:50%;padding:1px;margin-left:-5px}
 .slogo{height:15px;width:15px;object-fit:contain}
+.btn.sm{padding:6px 10px;font-size:12.5px}
+.btn[disabled],.opt[disabled]{opacity:.55;cursor:not-allowed}
+.arclist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.arc{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--sunk);display:flex;flex-direction:column;gap:6px}
 .jno{font-family:var(--display);color:var(--clay);margin-right:10px;font-size:.9em}
 .numset{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
 .numset input{width:84px} .t-성공{color:var(--good)} .t-보통{color:var(--muted)} .t-실패{color:var(--bad)}
@@ -154,7 +158,7 @@ tr.tot td{font-weight:600;background:var(--sunk)}
 <body>
 <header class="board"><div class="wrap">
   <div class="logo">퓨처스에서 영구결번까지<small>KBO 커리어 시뮬레이션 · 프로토타입</small></div>
-  <div class="hbtns"><button class="ghost" id="resetBtn" data-act="reset">새 커리어</button></div>
+  <div class="hbtns"><button class="ghost" data-act="arc">기록실</button><button class="ghost" id="resetBtn" data-act="reset">새 커리어</button></div>
 </div></header>
 <main><div class="wrap" id="app"></div></main>
 
@@ -331,6 +335,7 @@ dc:{
  raceWin:['5강 막차 탔다!!! 최종전 {nickI} 살렸다','{nick} 덕분에 가을야구 간다 ㅠ'],
  raceLose:['5위 문턱에서 끝… 아쉽다','최종전 그 장면만 계속 생각남'],
  captain:['캡틴 {nick} 더그아웃에서 분위기 메이커더라','주장 하면서 성적 유지하는 게 대단함','{nick} 주장 완장 잘 어울린다','후배들이 {nick} 따르는 게 보임','주장 첫해는 원래 부담 큼 지켜보자'],
+ juniors:['{nick} 사비로 후배들 {spot} 데려갔대 ㄷㄷ 리더네','이런 선배 있는 팀은 다르다','{nick} 사비 전훈 비용 얼마 나왔을까 ㅋㅋ','후배들 따라간 거 보니 내년 기대된다','이런 건 연봉 많이 받는 값 하는 거지'],
  captainBad:['{rank}위 팀 주장이면 할 말 없지','주장이면 팀 분위기도 책임져라','{nick} 주장 부담 때문에 자기 야구 못 하는 듯','주장 바꾸자는 말은 좀 아니다 혼자 진 거 아님']},
 dcReply:['ㄹㅇㅋㅋ','ㅇㅈ','이건 좀 아닌 듯','개추','반박 시 니 말이 맞음','ㄴㄴ 작년이 더 나았음','이게 맞지','선 넘네 ㅋㅋ','팩트) 맞는 말임','뇌절 ㄴ','ㅋㅋㅋㅋㅋ 미쳤냐','출처는?','이건 인정','어제 직관 갔는데 진짜임','ㄴ 니가 감독해라 그럼','또 시작이네','어그로 ㄴ','기록 보고 말해라 좀','ㅋㅋ 내일 되면 또 말 바뀜','{rival}팬 같은데'],
 dcNick:['잠실직관러','9회말2아웃','불펜방화범','직관요정','야구는구라다','외야석지박령','삼진은싫어','희생번트반대','퓨처스덕후','통산기록러'],
@@ -358,6 +363,7 @@ x:{
  clutchHero:['{clutch} {nick}!!!!!!! 🥹🥹','방금 {nick} 장면 보고 소리 질러서 이웃한테 죄송','{nick} 큰 경기 체질인 거 이제 다 알았지','{clutch} 직관한 사람 손 (나)'],
  clutchFail:['{nick} 괜찮아… 시즌 내내 잘했잖아','오늘은 {nick} 혼자 진 게 아니야','{nick} 고개 숙이지 마 ㅠ'],
  captain:['캡틴 {nick} 🫡','{nick} 주장 완장 찬 거 너무 멋있어','주장 {nick} 인터뷰 말하는 게 어른 다 됐네'],
+ juniors:['{nick} 후배들이랑 {spot} 전훈 사진 떴다 🌴','{nick} 선배미 무슨 일','사비 전훈이라니… {nick} 진짜 리더다'],
  captainBad:['{nick} 주장이라 더 힘들었을 텐데 ㅠ','캡틴 혼자 짊어지지 마'],
  hr30:['{hr}호 홈런 축하해 {nick} 💣'],sb30:['{nick} 도루 {sb}개 발이 그냥 빛의 속도'],so180:['{nick} 탈삼진 {so}개!! 닥터K'],sv30:['{sv}세이브 {nick} 수호신 그 자체']},
 xHandle:[['yagu','dugout','base','strike','homerun','glove','inning','bleacher','fastball','mound'],['fan','love','diary','life','note','day','log','zip']],
@@ -379,6 +385,7 @@ nvHead:{
  mlb:['{name}, 메이저리그 포스팅 신청… 미국 무대 도전','{name} 빅리그 도전, 복수 구단 관심'],
  clutchHero:["'{clutch}' {name}, 승부처에서 빛났다",'{name}, 가장 중요한 순간에 해냈다'],
  clutchFail:['{name}, 승부처서 고개 숙였다… "다음엔 꼭"','아쉬움 삼킨 {name}, {clutch}서 침묵'],
+ juniors:['{name}, 후배들과 사비 {spot} 전지훈련… "함께 성장하고 싶다"','\'맏형 리더십\' {name}, 후배 데리고 {spot}행'],
  captain:['{team} 새 주장에 {name}… "더그아웃 분위기부터 바꾸겠다"',"'캡틴' {name}, 선수단 투표로 주장 선임"]},
 nv:{
  draft:['잘 키워서 프랜차이즈 스타 만들자','고교 때 영상 봤는데 물건이다','신인은 일단 체력부터','몇 년 뒤가 기대된다','이 순번에 뽑을 선수는 아닌 것 같은데'],
@@ -398,6 +405,7 @@ nv:{
  mlb:['가서 증명하고 와라','KBO에서 보여줄 건 다 보여줬다','부상 없이 잘하길'],
  clutchHero:['이런 게 스타지','큰 경기에서 해주는 선수가 진짜다','소름 돋았다 진짜'],
  clutchFail:['그 상황이면 누구라도 어렵다','한 경기로 시즌 평가하지 맙시다','감독 선택이 더 아쉬웠다'],
+ juniors:['이런 게 진짜 베테랑이다','후배들한테는 돈 주고도 못 사는 경험','보기 좋다'],
  captain:['주장감이다 인정','리더십 있는 선수라 잘할 듯','주장 하면서 성적 떨어지는 경우 많던데 걱정','후배들이 잘 따른다더라'],
  hate:['한 시즌 반짝일 수도 있다','국제대회 가서 증명해봐라','언론이 너무 띄운다','기록 대비 영양가가 아쉽다'],
  defend:['그래도 팀에 필요한 선수다','욕할 시간에 응원 한 번 더','부상 여파도 있었다'],
@@ -422,10 +430,11 @@ cafe:{
  mlb:[['{nick} MLB 도전 응원 메시지 모아요','선수에게 전달될 수 있게 정리할게요']],
  clutchHero:[['[직관 후기] {clutch} 그 순간 영상 있습니다','손 떨려서 화질 죄송해요']],
  clutchFail:[['[부탁] {nick} 선수에게 악플 달지 맙시다','오늘 제일 속상한 건 선수 본인입니다']],
+ juniors:[['{nick} 선수 {spot} 전훈 근황 사진 모음','후배들 표정이 다 밝네요']],
  captain:[['[축] {nick} 선수 주장 선임!','주장 기념 응원 문구 같이 정해요']]}};
 const POSITIVE=['mvp','great','good','ks','award','debut','draft','fa_stay','legend','mlb','clutchHero','raceWin'];
 // 반응 수치: 팬 수(로그 스케일) × 이벤트 크기 × 로그정규 분산. 대부분은 작고 가끔 크게 터진다.
-const HYPE={draft:.7,debut:.9,mvp:1.8,great:1.3,good:.9,meh:.8,bad:1.1,futures:.35,sangmu:.35,injury:.8,ks:2.2,award:1.4,fa_stay:1.6,fa_move:2,retire:1.5,legend:2.2,mlb:2,clutchHero:2,clutchFail:1.6,raceWin:1.4,raceLose:1,captain:1.2};
+const HYPE={draft:.7,debut:.9,mvp:1.8,great:1.3,good:.9,meh:.8,bad:1.1,futures:.35,sangmu:.35,injury:.8,ks:2.2,award:1.4,fa_stay:1.6,fa_move:2,retire:1.5,legend:2.2,mlb:2,clutchHero:2,clutchFail:1.6,raceWin:1.4,raceLose:1,captain:1.2,juniors:1.2};
 function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
 const logn=(m,s)=>m*Math.exp(gauss()*s);
 function fameLv(){return clamp((Math.log10(Math.max(G.fans,100))-2.5)/2.5,0,1.3);}
@@ -523,7 +532,7 @@ function franchise(){
   const e=Object.entries(by).sort((a,b)=>b[1].war-a[1].war)[0];if(!e)return null;
   const mvp=G.awards.filter(a=>a.a==='정규시즌 MVP').length,ring=G.awards.filter(a=>a.a==='한국시리즈 우승').length;
   const caps=G.career.filter(r=>r.lvl==='1군'&&r.team===e[0]&&r.cap).length;
-  const score=Math.round(e[1].war+mvp*4+ring*3+(e[1].n>=15?5:0)+caps*1.5);
+  const score=Math.round(e[1].war+mvp*4+ring*3+(e[1].n>=15?5:0)+caps*1.5+(G.juniorCamps||0));
   const nc={};G.career.filter(r=>r.lvl==='1군'&&r.team===e[0]&&r.num!=null).forEach(r=>nc[r.num]=(nc[r.num]||0)+1);
   const num=+(Object.entries(nc).sort((a,b)=>b[1]-a[1])[0]||[G.num])[0];
   return {team:e[0],num,war:e[1].war,n:e[1].n,score,retired:e[1].n>=12&&score>=FR_LINE&&G.retireReason!=='mlb'};
@@ -605,7 +614,7 @@ function newCareer(f){
   G={v:2,style:f.style,stage:'hs',amateur:[],winter:null,winterNotes:[],name:f.name,school:f.school,type:f.type,pos:f.type==='B'?f.pos:'투수',trait:f.trait,throws:f.throws||'우투',
     age:18,year:2026,team:-1,r,pot,num:parseNum(f.num)??pick([1,2,5,7,8,10,11,13,17,18,19,21,22,24,25,27,29,33,36,47,51,52,53,61]),career:[],awards:[],news:[],salary:0,fans:300,
     oneGun:0,faClock:0,faNeed:8,faCount:0,exempt:false,served:false,service:0,postingDone:false,
-    injRisk:1,lastWAR:0,role:'고교',phase:'hs',queue:[],last:null,tab:'season',pend:null,draft:null,contract:null};
+    injRisk:1,lastWAR:0,cash:0,owned:[],role:'고교',phase:'hs',queue:[],last:null,tab:'season',pend:null,draft:null,contract:null};
   news(`${f.school} 3학년 ${G.pos} ${f.name}, 마지막 고교 시즌을 앞두다.`);
 }
 
@@ -750,7 +759,7 @@ function seasonAwards(rec,firstYear){
 function simSeason(){
   const recs=[];
   let inj=0;
-  const injP=.11*(G.trait==='iron'?.34:1)*G.injRisk;
+  const injP=.11*(G.trait==='iron'?.34:1)*G.injRisk*((G.owned||[]).includes('recov')?.85:1);
   if(chance(injP)){inj=rnd(.12,.55);}
   G.injRisk=1;
   const halves=G.service===1?[['상무',.5],['team',.5]]:[[G.service>0?'상무':'team',1]];
@@ -780,7 +789,7 @@ function playSeason(){
   if(main&&!G.debut)G.debut=G.year;
   const awards=recs.flatMap(r=>{const a=seasonAwards(r,firstYear&&r===main);r.awards=a.filter(x=>x.won).map(x=>x.a);return a;});
   recs.forEach(r=>G.career.push(r));
-  G.cur={recs,inj,war,firstYear:!!firstYear,awards,main:!!main,ord:standings((main?war*.011:0)+(G.captain&&main?.01:0)),ps:null,tbDone:{},intl:null,clutch:[],step:'tb'};
+  G.cur={recs,inj,war,firstYear:!!firstYear,awards,main:!!main,ord:standings((main?war*.011:0)+(G.captain&&main?.01:0)+(G.campTeam&&main?.008:0)),ps:null,tbDone:{},intl:null,clutch:[],step:'tb'};
   advanceSeason();
 }
 
@@ -909,6 +918,8 @@ function finishSeason(){
     if(main)G.salary=Math.max(.3,Math.max(G.salary*(war<0?.8:1),.3+Math.max(0,war)*1.2+G.oneGun*.12));
     else G.salary=Math.max(.3,G.salary*.92);
   }
+  G.cash=Math.round(((G.cash||0)+G.salary*.6)*100)/100;   // 세금·생활비를 빼고 연봉의 약 60%가 쌓인다
+  G.campTeam=false;
   if(G.contract){G.contract.left--;}
   if(G.service>0){G.service--;if(G.service===0){G.served=true;news('상무 복무를 마치고 전역했다.',true);}}
   G.lastWAR=main?war:-0.5;
@@ -932,8 +943,8 @@ const PIT_TRAIN=[
 const TIERS={안정:[['대박',.04],['성공',.40],['보통',.48],['실패',.08]],보통:[['대박',.09],['성공',.34],['보통',.40],['실패',.17]],도박:[['대박',.2],['성공',.25],['보통',.25],['실패',.30]]};
 const VOL_TXT={안정:'결과 폭 작음',보통:'결과 폭 보통',도박:'결과 폭 큼'};
 function trainDesc(t){return Object.keys(t.e).map(k=>KN(k)+' ▲').join(' · ')+(t.side?' · '+Object.keys(t.side).map(k=>KN(k)+' ▼').join(' · '):'')+(t.risk?' · 부상 위험':'');}
-function rollTier(vol){
-  const tb=TIERS[vol].map(x=>[...x]);
+function rollTier(vol,big=0){
+  const tb=TIERS[vol].map(x=>[...x]);if(big){tb[0][1]+=big;tb[3][1]=Math.max(0,tb[3][1]-big*.6);tb[2][1]=Math.max(0,tb[2][1]-big*.4);}
   if(G.trait==='grinder'){tb[0][1]+=.04;tb[2][1]+=.01;tb[3][1]=Math.max(0,tb[3][1]-.05);}
   let x=Math.random();for(const [n,p] of tb){if(x<p)return n;x-=p;}return '보통';
 }
@@ -956,11 +967,11 @@ function buildOffseason(){
   const ov=overall();
   if(G.age>=41||(G.age>=35&&ov<48)||(G.age>=31&&ov<43)||(G.age>=27&&G.oneGun===0&&ov<45)){q.push('retire');G.queue=q;return;}
   if(!G.exempt&&!G.served&&G.service===0&&G.age>=21)q.push('mil');
-  if(!G.postingDone&&G.oneGun>=7&&ov>=68&&G.age<=31)q.push('posting');
   if(G.faClock>=G.faNeed)q.push('fa');
   if(G.service===0&&(G.oneGun>=1||G.age>=22)){const need=(G.type==='P'&&G.age>=33&&G.style==='power')||(G.type==='B'&&G.r.def<45&&['유격수','포수','중견수','2루수'].includes(G.pos));if(chance(need?.7:.3))q.push('meet');}
   if(!G.captain&&G.service===0&&G.oneGun>=4&&G.age>=27&&G.lastWAR>=1.5&&(G.captainNo||0)<G.year-2&&chance(G.lastWAR>=4?.5:.3))q.push('captain');
   if(chance(.6))q.push('event');
+  if(G.stage==='pro')q.push('shop');
   q.push('train');
   G.queue=q;
 }
@@ -972,6 +983,7 @@ function nextStep(){
   if(s==='train'){const pool=(G.type==='B'?BAT_TRAIN:PIT_TRAIN).slice();G.pend=[];while(G.pend.length<3){const i=ri(0,pool.length-1);G.pend.push(pool.splice(i,1)[0]);}}
   if(s==='fa')G.pend=makeOffers();
   if(s==='meet')G.pend=meetOptions();
+  if(s==='shop'){G.shopBought=[];G.wb=null;}
 }
 function makeOffers(){
   const recent=G.career.filter(c=>c.lvl==='1군').slice(-3);
@@ -997,7 +1009,7 @@ function applyEvent(code){
   if(code==='yt'){G.fans+=ri(3000,9000);}
 }
 function applyTrain(t){
-  const before={...G.r},mul=(G.age<=25?1:G.age<=30?.8:.6)*(G.captain?.85:1),tier=rollTier(t.vol);
+  const wb=G.wb||{mul:1,big:0},before={...G.r},mul=(G.age<=25?1:G.age<=30?.8:.6)*(G.captain?.85:1)*wb.mul,tier=rollTier(t.vol,wb.big);G.wb=null;
   const set=(k,v)=>{G.r[k]=clamp(G.r[k]+v,20,85);};
   for(const k in t.e){const b=t.e[k]*mul;
     if(tier==='대박'){set(k,Math.round(b*rnd(1.8,2.6)));G.pot[k]=clamp(G.pot[k]+ri(2,4),20,88);}
@@ -1075,7 +1087,7 @@ function signPro(mode){
   G.winterBase={...G.r};
   if(mode==='ik'){G.team=ri(0,9);G.ikseong=true;news(`${team(G.team).n}와 육성선수 계약. 바닥부터 다시 시작한다.`,true);}
   else{G.team=d.t;news(`${yr} KBO 신인드래프트 ${d.round}라운드 전체 ${(d.round-1)*10+d.pick}순위로 ${team(d.t).n} 입단. 계약금 ${won(d.bonus)}.`,true);G.fans+=d.round===1?3000:500;}
-  G.salary=.3;G.faNeed=G.stage==='college'?7:8;G.stage='pro';
+  G.salary=.3;G.cash=(G.cash||0)+(mode==='ik'?0:G.draft.bonus);G.faNeed=G.stage==='college'?7:8;G.stage='pro';
   G.age++;G.year++;G.winterNotes=growth();G.winter=diffWinter();
   G.role=decideRole();G.phase='pre';
   news(`${G.year} 시즌 개막. 보직: ${G.role}.`);
@@ -1089,6 +1101,86 @@ function careerTotals(lvl='1군'){
   const t={};rs.forEach(r=>{for(const k in r.s){if(typeof r.s[k]==='number'&&k!=='ERA')t[k]=(t[k]||0)+r.s[k];}});
   if(G.type==='P'&&t.outs)t.ERA=t.ER*27/t.outs;
   t.seasons=rs.length;return t;
+}
+// 은퇴한 KBO 선수 통산 기록(1군). 출처: 위키백과 선수 문서 정보상자 등 공개 자료. 일부 항목은 비어 있다(null).
+// 타자: [이름, 활동기간, 포지션, 타율, 안타, 홈런, 타점, 도루]
+const LEG_B=[
+ ['양준혁','1993–2010','외야·1루',.316,2318,351,1389,193],['이승엽','1995–2017','1루',.302,2156,467,1498,34],
+ ['이대호','2001–2022','1루',.309,2199,374,1425,null],['김태균','2001–2020','1루',.320,2209,311,1358,null],
+ ['장종훈','1987–2005','유격·1루',.281,1771,340,1145,null],['이종범','1993–2012','유격·외야',.297,1797,194,730,510],
+ ['전준호','1991–2009','외야',.291,2018,42,577,550],['박용택','2002–2022','외야',.308,2504,213,1192,313],
+ ['박한이','2001–2019','외야',.294,2174,146,906,null],['이병규','1997–2016','외야',.311,2043,161,972,null],
+ ['홍성흔','1999–2016','포수·지명',.301,2046,208,1120,null],['김동주','1998–2013','3루',.309,null,273,1097,null],
+ ['심정수','1994–2008','외야',.287,1451,328,1029,null],['이범호','2000–2019','3루',.271,null,334,1127,null],
+ ['박경완','1991–2013','포수',.249,null,314,995,null],['정근우','2005–2020','2루',.302,1877,121,722,371],
+ ['장성호','1996–2015','1루·외야',.296,2100,221,1043,null],['장효조','1983–1992','외야',.331,1009,54,437,null]];
+// 투수: [이름, 활동기간, 유형, 승, 패, 세이브, 평균자책점, 탈삼진]
+const LEG_P=[
+ ['선동열','1985–1995','선발·마무리',146,40,132,1.20,1698],['송진우','1989–2009','선발',210,153,103,3.51,2048],
+ ['최동원','1983–1990','선발',103,74,26,2.46,1019],['이강철','1989–2005','선발',152,109,53,3.29,1749],
+ ['배영수','2000–2019','선발',138,122,null,4.46,1436],['손민한','1997–2015','선발',123,88,null,3.55,968],
+ ['윤석민','2005–2018','선발·마무리',77,75,86,3.29,1072],['임창용','1995–2018','마무리',130,86,258,3.45,1474],
+ ['송승준','2007–2019','선발',109,85,null,4.48,1238],['정민철','1992–2009','선발',161,128,null,3.51,null],
+ ['김용수','1985–2000','마무리·선발',126,89,227,2.98,null]];
+// 누적 유사도: 빌 제임스 유사도 점수(1000점 만점) 방식을 KBO 기록에 맞게 줄인 것. 빈 항목은 계산에서 빼고 비율로 보정
+function simScore(terms){const ok=terms.filter(t=>t[0]!=null&&t[1]!=null);if(!ok.length)return 0;
+  const pen=ok.reduce((a,[x,y,d])=>a+Math.abs(x-y)/d,0)*terms.length/ok.length;return Math.round(Math.max(0,1000-pen));}
+function similarPlayers(){
+  const t=careerTotals();
+  if(G.type==='B'){if(!t.PA)return null;const avg=t.H/t.AB;
+    const cum=LEG_B.map(L=>({L,sc:simScore([[t.H,L[4],15],[t.HR,L[5],2],[t.RBI,L[6],10],[t.SB,L[7],20],[avg*1000,L[3]*1000,1]])}));
+    const prof=x=>x.H?[x.avg,x.HR/x.H,x.RBI/x.H,x.SB!=null?x.SB/x.H:null]:[x.avg,null,null,null];
+    const me=prof({avg,H:t.H,HR:t.HR,RBI:t.RBI,SB:t.SB});
+    const sty=LEG_B.map(L=>{const o=prof({avg:L[3],H:L[4]??(L[5]*7),HR:L[5],RBI:L[6],SB:L[7]});
+      return {L,sc:simScore([[me[0],o[0],.0006],[me[1],o[1],.002],[me[2],o[2],.004],[me[3],o[3],.002]])};});
+    return pack(cum,sty,t.H<800);}
+  if(!t.outs)return null;
+  const cum=LEG_P.map(L=>({L,sc:simScore([[t.W,L[3],1],[t.L,L[4],2],[t.SV,L[5],3],[t.ERA,L[6],.02],[t.SO,L[7],10]])}));
+  const dec=x=>x.W+x.L||1;
+  const sty=LEG_P.map(L=>({L,sc:simScore([[t.ERA,L[6],.008],[t.SV/(dec(t)+t.SV||1),L[5]!=null?L[5]/(dec({W:L[3],L:L[4]})+L[5]):null,.002],[t.W/dec(t),L[3]/dec({W:L[3],L:L[4]}),.0015],[t.SO/dec(t),L[7]!=null?L[7]/dec({W:L[3],L:L[4]}):null,.02]])}));
+  return pack(cum,sty,t.W+t.SV<60);
+}
+function pack(cum,sty,short){cum.sort((a,b)=>b.sc-a.sc);sty.sort((a,b)=>b.sc-a.sc);
+  const f=x=>({name:x.L[0],yrs:x.L[1],pos:x.L[2],sc:x.sc,line:G.type==='B'?`${f3(x.L[3])} · ${x.L[4]!=null?x.L[4]+'안타 · ':''}${x.L[5]}홈런 · ${x.L[6]}타점${x.L[7]!=null?` · ${x.L[7]}도루`:''}`:`${x.L[3]}승 ${x.L[4]}패${x.L[5]!=null?` ${x.L[5]}세이브`:''} · 평균자책점 ${x.L[6].toFixed(2)}${x.L[7]!=null?` · ${x.L[7]}탈삼진`:''}`});
+  return {cum:cum.slice(0,3).map(f),sty:f(sty[0]),short:!!short};}
+function simVerdict(s){return s>=950?'거의 판박이':s>=900?'매우 비슷':s>=800?'꽤 비슷':s>=650?'어느 정도 닮음':'굳이 꼽자면';}
+// 상점: 연봉의 일부(세금·생활비 빼고 약 60%)가 쌓인 자금으로 겨울마다 장비와 사설 훈련을 산다
+const SHOP=[
+ {id:'bat',cat:'장비',t:'B',n:'맞춤 제작 배트 세트',p:.15,d:'컨택 +1 · 파워 +1 (영구)',eff:{con:1,pow:1}},
+ {id:'glove',cat:'장비',t:'B',n:'수제 글러브',p:.1,d:'수비 +2 (영구)',eff:{def:2}},
+ {id:'spike',cat:'장비',t:'B',n:'경량 스파이크',p:.08,d:'주루 +1 (영구)',eff:{spd:1}},
+ {id:'pglove',cat:'장비',t:'P',n:'투수용 맞춤 글러브',p:.1,d:'제구 +1 (영구)',eff:{ctl:1}},
+ {id:'tracker',cat:'장비',t:'P',n:'개인 투구 추적 장비',p:.3,d:'변화구 +1 · 제구 +1 (영구)',eff:{brk:1,ctl:1}},
+ {id:'recov',cat:'장비',n:'회복 장비 세트 (냉각·압박)',p:.25,d:'부상 확률 15% ▼ (영구)'},
+ {id:'pt',cat:'관리',n:'개인 트레이너 PT·필라테스',p:.2,d:'다음 시즌 부상 위험 30% ▼'},
+ {id:'academy',cat:'캠프',n:'사설 아카데미 개인 레슨',p:.4,d:'이번 겨울 훈련 효과 ×1.3 · 대박 확률 +3%p',mul:1.3,big:.03},
+ {id:'usa',cat:'캠프',n:'미국 사설 트레이닝 센터 연수',p:1.2,d:'훈련 효과 ×1.5 · 대박 확률 +8%p',mul:1.5,big:.08},
+ {id:'juniors',cat:'캠프',n:'후배들 데리고 사비 해외 전지훈련',p:2.5,d:'훈련 효과 ×1.3 · 다음 시즌 팀 전력 ▲ · 팬 ▲ · 영구결번 지수 가산',mul:1.3,big:.04,
+   req:()=>G.age>=29&&G.oneGun>=5,why:'1군 5시즌·만 29세 이상 베테랑만'},
+ {id:'donate',cat:'기부',n:'모교 야구부 장비 기부',p:.5,d:'팬 ▲ · 모교에 이름을 남긴다'}];
+const SHOP_CAT={장비:'장비 (한 번 사면 계속 효과)',관리:'몸 관리',캠프:'겨울 개인 훈련 (한 겨울에 하나)',기부:'기부'};
+const JUNIOR_SPOT=['사이판','괌','오키나와','호주 시드니'];
+function shopState(it){
+  if(it.t&&it.t!==G.type)return 'hide';
+  const own=(G.owned||[]).includes(it.id),bought=(G.shopBought||[]);
+  if(it.cat==='장비'&&own)return 'own';
+  if(it.cat==='캠프'&&bought.some(b=>SHOP.find(x=>x.id===b).cat==='캠프'))return bought.includes(it.id)?'done':'other';
+  if(bought.includes(it.id))return 'done';
+  if(it.req&&!it.req())return 'lock';
+  if(it.id==='donate'&&G.lastDonate&&G.year-G.lastDonate<3)return 'wait';
+  if((G.cash||0)<it.p)return 'poor';
+  return 'ok';
+}
+function buy(id){
+  const it=SHOP.find(x=>x.id===id);if(!it||shopState(it)!=='ok')return;
+  G.cash=Math.round((G.cash-it.p)*100)/100;(G.shopBought=G.shopBought||[]).push(id);
+  if(it.cat==='장비'){(G.owned=G.owned||[]).push(id);if(it.eff)for(const k in it.eff)G.r[k]=clamp(G.r[k]+it.eff[k],20,85);news(`${it.n} 구입 (${won(it.p)}).`);}
+  if(id==='pt'){G.injRisk*=.7;news('개인 트레이너와 겨울 내내 몸을 관리했다.');}
+  if(it.cat==='캠프'){G.wb={mul:it.mul,big:it.big,n:it.n};
+    if(id==='juniors'){const sp=pick(JUNIOR_SPOT);G.campTeam=true;G.juniorCamps=(G.juniorCamps||0)+1;G.fans+=ri(3000,7000);
+      news(`후배 ${ri(4,9)}명을 데리고 사비로 ${sp} 전지훈련을 떠났다. 비용 ${won(it.p)} 전액 부담.`,true);G.preSNS=makeSNS(['juniors'],snsCtx({spot:sp}));}
+    else news(`${it.n} 등록 (${won(it.p)}).`);}
+  if(id==='donate'){G.lastDonate=G.year;G.fans+=ri(3000,6000);news(`모교 ${G.school} 야구부에 장비를 기부했다.`,true);}
 }
 // GAME END
 
@@ -1125,6 +1217,7 @@ function playerCard(){
     <dl class="kv">
       ${G.type==='P'?`<dt>직구 최고</dt><dd class="num">${velo()}km/h</dd>`:''}
       <dt>연봉</dt><dd>${G.team>=0?won(G.salary):'-'}</dd>
+      ${G.team>=0?`<dt>보유 자금</dt><dd>${won(G.cash||0)}</dd>`:''}
       <dt>팬</dt><dd class="num">${G.fans.toLocaleString()}명</dd>
       <dt>병역</dt><dd>${mil}</dd>
       <dt>1군 시즌</dt><dd class="num">${G.oneGun}</dd>
@@ -1239,6 +1332,14 @@ function phasePanel(){
       <p class="rv" style="--i:5">${esc(t.txt)}</p>
       <div class="callout rv" style="--i:6"><b>${esc(t.after)}</b></div>
       <div class="rv" style="--i:7"><button class="btn" data-act="cnext">계속</button></div></section>`;}
+  if(P==='shop'){const cats=Object.keys(SHOP_CAT);
+    return `<section class="card stack fade"><div class="lbl">오프시즌 · 상점</div><h2>보유 자금 ${won(G.cash||0)}</h2>
+      <p class="note">연봉에서 세금·생활비를 빼고 약 60%가 자금으로 쌓입니다. 겨울 개인 훈련은 이어지는 스프링캠프 훈련 결과에 바로 반영됩니다.</p>
+      ${cats.map(c=>{const items=SHOP.filter(it=>it.cat===c&&shopState(it)!=='hide');if(!items.length)return '';
+        return `<div class="lbl">${SHOP_CAT[c]}</div><div class="opts">${items.map(it=>{const st=shopState(it);
+          const tag={own:'보유 중',done:'구매 완료',other:'다른 훈련 선택함',lock:it.why||'조건 미달',wait:'3년에 한 번',poor:'자금 부족',ok:won(it.p)}[st];
+          return `<button class="opt ${st==='done'||st==='own'?'on':''}" data-act="buy" data-v="${it.id}" ${st==='ok'?'':'disabled aria-disabled="true"'}><b>${esc(it.n)}</b><span>${esc(it.d)}</span><span class="vol ${st==='ok'?'v-안정':st==='done'||st==='own'?'v-보통':'v-도박'}">${st==='ok'?'':won(it.p)+' · '}${esc(tag)}</span></button>`;}).join('')}</div>`;}).join('')}
+      <div><button class="btn" data-act="shopdone">스프링캠프로</button></div></section>`;}
   if(P==='captain')return `<section class="card stack fade"><div class="lbl">오프시즌 · 선수단 투표</div><h2>${esc(team(G.team).s)}의 새 주장으로 추천됐다</h2>
       <p>감독과 선수단이 다음 시즌 주장 완장을 맡아달라고 한다. 더그아웃의 중심이 되면 팀 분위기와 큰 경기 집중력이 올라가지만, 후배들을 챙기느라 개인 훈련 시간은 줄어든다.</p>
       <div class="opts"><button class="opt" data-act="cap" data-v="yes"><b>주장 완장을 찬다</b><span>팀 전력 소폭 ▲ · 승부처 성공 확률 +3%p · 팬 ▲ · 영구결번 지수 가산</span><span class="vol v-보통">겨울 훈련 효과 15% ▼ · 팀 성적이 나쁘면 비판도 함께</span></button>
@@ -1288,13 +1389,17 @@ function endPanel(){
   else verdict='끝내 1군의 벽을 넘지 못했다. 그래도 퓨처스에서 흘린 땀은 진짜였다.';
   if(!G.endSNS)G.endSNS=makeSNS([G.retireReason==='mlb'?'mlb':fr&&fr.retired?'legend':'retire','retire'],snsCtx({team:frName||(G.team>=0?team(G.team).n:''),ts:fr?fr.team:'',num:fr?fr.num:G.num}));
   const line=G.type==='B'&&t.PA?`${f3(t.H/t.AB)} · ${t.HR}홈런 · ${t.RBI}타점 · ${t.SB}도루 · ${t.H}안타`:G.type==='P'&&t.outs?`${t.W}승 ${t.L}패 ${t.SV?t.SV+'세이브 ':''}${t.HLD?t.HLD+'홀드 ':''}· 평균자책점 ${f2(t.ERA)} · ${ipStr(t.outs)}이닝 · ${t.SO}탈삼진`:'1군 기록 없음';
+  if(G.sim===undefined)G.sim=similarPlayers();
+  archiveCareer(verdict,line,war,fr,frName,G.sim);
   return `<section class="card stack fade"><div class="lbl">${G.retireReason==='mlb'?'KBO 커리어 종료':'현역 은퇴'} · ${G.year}</div>
     <h2 class="stamp" style="--i:1">${esc(verdict)}</h2>
     <div class="line"><div><small>1군 통산</small><b style="font-size:15px">${line}</b></div><div><small>통산 WAR</small><b>${f1(war)}</b></div><div><small>1군 시즌</small><b>${t.seasons}</b></div></div>
     <p class="note">거쳐간 팀: ${teams.join(', ')||'-'} · 팬 ${G.fans.toLocaleString()}명</p>
     ${fr?`<p class="note">프랜차이즈 지수 ${fr.score} (${esc(frName)} ${fr.n}시즌 · WAR ${f1(fr.war)} + MVP·우승 가산) · 영구결번 기준: 한 팀 12시즌 이상, 지수 ${FR_LINE} 이상</p>`:''}
     ${snsFeed(G.endSNS,3)}
-    <div><button class="btn" data-act="reset2">새 커리어 시작</button></div></section>`;
+    ${G.sim?simBlock(G.sim,G.type):'<p class="note">1군 기록이 없어 KBO 선배와 비교할 수 없습니다.</p>'}
+    <p class="callout">이 커리어는 기록실에 저장됐습니다. 상단의 <b>기록실</b>에서 다시 보고, 파일로 내보낼 수 있습니다.</p>
+    <div class="row"><button class="btn" data-act="reset2">새 커리어 시작</button><button class="btn sec" data-act="arc">기록실 보기</button></div></section>`;
 }
 
 function newForm(){
@@ -1353,9 +1458,72 @@ function countUp(){
     el.textContent=FMT[f](0);requestAnimationFrame(step);
   });
 }
+// 기록실: 은퇴한 커리어를 브라우저에 따로 보관하고, JSON 파일로 내보내거나 불러올 수 있다
+const ARC_KEY='kbo-futures-archive';
+function arcLoad(){try{const a=JSON.parse(localStorage.getItem(ARC_KEY)||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
+function arcSave(a){try{localStorage.setItem(ARC_KEY,JSON.stringify(a));return true;}catch(e){return false;}}
+let VIEW='game',arcOpen=null,arcMsg='',arcDel=null;
+function careerRows(){
+  return [...(G.amateur||[]),...G.career].map(r=>{const s=r.s;
+    if(G.type==='B'){const x=slash(s),w=r.lvl==='1군'?wrcPlus(s):null;return [r.year,r.age,r.team+({'고교':' (고교)','대학':' (대학)','퓨처스':' (2군)','상무':' (상무)'}[r.lvl]||''),r.num??'',s.G,s.PA,f3(x.avg),s.HR,s.RBI,s.SB,f3(x.ops),w?w.plus:'-',s.WAR==null?'-':f1(s.WAR),(r.awards||[]).join(', ')];}
+    return [r.year,r.age,r.team+({'고교':' (고교)','대학':' (대학)','퓨처스':' (2군)','상무':' (상무)'}[r.lvl]||''),r.num??'',s.G,s.W,s.L,s.SV,s.HLD,ipStr(s.outs),f2(s.ER*27/s.outs),s.SO,s.WAR==null?'-':f1(s.WAR),(r.awards||[]).join(', ')];});
+}
+function archiveCareer(verdict,line,war,fr,frName,sim){
+  if(G.archived)return;G.archived=true;
+  const cnt={};G.awards.forEach(a=>cnt[a.a]=(cnt[a.a]||0)+1);
+  const e={id:Date.now()+'-'+ri(100,999),saved:new Date().toISOString().slice(0,10),name:G.name,num:G.num,type:G.type,pos:G.pos,throws:G.throws,school:G.school,
+    from:(G.amateur[0]||G.career[0]||{year:G.year}).year,to:G.year,age:G.age,verdict,line,war:Math.round(war*10)/10,
+    teams:[...new Set(G.career.filter(c=>c.lvl==='1군').map(c=>c.team))],fans:G.fans,awards:cnt,
+    retired:fr&&fr.retired?{team:frName,num:fr.num}:null,clutch:[G.clutchW||0,G.clutchL||0],sim,rows:careerRows()};
+  const a=arcLoad();a.unshift(e);arcSave(a);news('커리어가 기록실에 저장됐다.');
+}
+const HEAD_B=['연도','나이','소속','No.','G','PA','AVG','HR','RBI','SB','OPS','wRC+','WAR','수상'];
+const HEAD_P=['연도','나이','소속','No.','G','W','L','SV','HLD','IP','ERA','SO','WAR','수상'];
+function arcText(e){
+  const aw=Object.entries(e.awards||{}).map(([a,n])=>a+(n>1?'×'+n:'')).join(', ');
+  return `[퓨처스에서 영구결번까지] ${e.name} (No.${e.num}, ${e.type==='B'?e.pos:'투수'}) ${e.from}–${e.to}\n${e.verdict}\n1군 통산: ${e.line} · WAR ${e.war}\n소속: ${e.teams.join(', ')||'-'}\n수상: ${aw||'-'}${e.sim?`\n가장 비슷한 KBO 선배: ${e.sim.cum[0].name} (누적 유사도 ${e.sim.cum[0].sc}) · 스타일: ${e.sim.sty.name}`:''}`;
+}
+function archivePanel(){
+  const a=arcLoad();
+  const list=a.map(e=>{const open=arcOpen===e.id,H=e.type==='B'?HEAD_B:HEAD_P;
+    return `<li class="arc"><div class="row" style="justify-content:space-between"><div><b>${e.retired?'<span class="badge">영구결번</span> ':''}<span class="jno">${esc(e.num)}</span>${esc(e.name)}</b>
+      <span class="note"> · ${e.type==='B'?esc(e.pos):'투수'} · ${e.from}–${e.to} · ${esc(e.teams.join(', ')||'1군 기록 없음')}</span></div>
+      <div class="row"><button class="btn sec sm" data-act="arcopen" data-v="${esc(e.id)}">${open?'접기':'자세히'}</button><button class="btn sec sm" data-act="arccopy" data-v="${esc(e.id)}">텍스트 복사</button><button class="btn sec sm" data-act="arcdel" data-v="${esc(e.id)}">${arcDel===e.id?'정말 삭제?':'삭제'}</button></div></div>
+      <p>${esc(e.verdict)}</p><p class="note">${esc(e.line)} · WAR ${e.war}${e.sim?` · 가장 비슷한 선배: <b>${esc(e.sim.cum[0].name)}</b>`:''}</p>
+      ${open?`<div class="stack" style="gap:8px;margin-top:8px">${Object.keys(e.awards||{}).length?`<div class="badges">${Object.entries(e.awards).map(([k,n])=>`<span class="badge">${esc(k)}${n>1?' ×'+n:''}</span>`).join('')}</div>`:''}
+        ${e.sim?simBlock(e.sim,e.type):''}
+        <div class="tbl"><table><thead><tr>${H.map((h,k)=>`<th class="${k===2||k===13?'l':''}">${h}</th>`).join('')}</tr></thead><tbody>${e.rows.map(r=>`<tr class="${/\((고교|대학|2군|상무)\)/.test(r[2])?'fut':''}">${r.map((c,k)=>`<td class="${k===2||k===13?'l':''}">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+        <p class="note">저장일 ${esc(e.saved)} · 팬 ${(+e.fans||0).toLocaleString()}명 · 승부처 ${e.clutch[0]}승 ${e.clutch[1]}패</p></div>`:''}</li>`;}).join('');
+  return `<section class="card stack fade"><div class="lbl">기록실</div><h2>지나간 커리어들</h2>
+    <p class="note">은퇴하면 커리어가 자동으로 여기에 저장됩니다. 이 브라우저에만 저장되므로, 다른 기기로 옮기거나 백업하려면 파일로 내보내 두세요.</p>
+    <div class="row"><button class="btn sec" data-act="arcexport" ${a.length?'':'disabled'}>파일로 내보내기 (.json)</button><label class="btn sec" for="arcFile" style="cursor:pointer">파일 불러오기</label><input id="arcFile" type="file" accept=".json,application/json" hidden><button class="btn" data-act="arcclose">게임으로 돌아가기</button></div>
+    ${arcMsg?`<p class="callout">${esc(arcMsg)}</p>`:''}
+    ${a.length?`<ul class="arclist">${list}</ul>`:'<p class="note">아직 저장된 커리어가 없습니다. 첫 은퇴식을 치르면 여기에 남습니다.</p>'}</section>`;
+}
+function simBlock(sim,type){
+  return `<div class="stack" style="gap:6px"><div class="lbl">기록상 가장 비슷한 KBO 선배 ${type==='B'?'타자':'투수'}</div>
+    <ul class="awards">${sim.cum.map((x,k)=>`<li><span class="${k?'pill2':'badge'}">${k+1}위</span><b>${esc(x.name)} <span class="note">(${esc(x.yrs)} · ${esc(x.pos)})</span></b><span class="note">통산 ${esc(x.line)} · 누적 유사도 ${x.sc} · ${simVerdict(x.sc)}</span></li>`).join('')}</ul>
+    ${sim.short?'<p class="callout">1군 통산 규모가 비교 대상 선배들보다 훨씬 작아서, 누적 기록보다는 아래 스타일 비교가 더 의미 있습니다.</p>':''}
+    <p class="note">스타일(비율 기록)이 가장 닮은 선배: <b>${esc(sim.sty.name)}</b> (${esc(sim.sty.line)} · 유사도 ${sim.sty.sc}). 누적 유사도는 빌 제임스의 유사도 점수(1000점 만점) 방식을 KBO 기록에 맞게 줄인 것이고, 비교 대상은 은퇴한 선수 일부입니다.</p></div>`;
+}
+function arcExport(){
+  const blob=new Blob([JSON.stringify({app:'kbo-futures',v:1,careers:arcLoad()},null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`kbo-career-records-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();
+  arcMsg='파일을 내려받았습니다.';
+}
+function arcImport(file){
+  const rd=new FileReader();
+  rd.onload=()=>{try{const d=JSON.parse(rd.result),list=Array.isArray(d)?d:d.careers;if(!Array.isArray(list))throw 0;
+      const a=arcLoad(),ids=new Set(a.map(x=>x.id));let n=0;
+      list.forEach(e=>{if(e&&e.id&&e.name&&Array.isArray(e.rows)&&!ids.has(e.id)){a.push(e);n++;}});
+      a.sort((x,y)=>String(y.saved).localeCompare(String(x.saved)));arcSave(a);arcMsg=`${n}개의 커리어를 불러왔습니다.`;}
+    catch(e){arcMsg='불러오지 못했습니다. 이 게임에서 내보낸 .json 파일인지 확인해 주세요.';}
+    render();};
+  rd.readAsText(file);
+}
 function render(){
   const doAnim=anim&&!reduce();anim=false;
-  app.innerHTML=playerCard()+`<div class="stack"><div class="${doAnim?'reveal':''}">${phasePanel()}</div>${lowerPanel()}</div>`;
+  app.innerHTML=playerCard()+(VIEW==='archive'?`<div class="stack">${archivePanel()}</div>`:`<div class="stack"><div class="${doAnim?'reveal':''}">${phasePanel()}</div>${lowerPanel()}</div>`);
   if(doAnim)countUp();
   const rb=document.getElementById('resetBtn');
   rb.textContent=confirmReset?'정말 새로 시작?':'새 커리어';
@@ -1368,6 +1536,7 @@ app.addEventListener('input',e=>{
 });
 app.addEventListener('change',e=>{
   const id=e.target.id;
+  if(id==='arcFile'&&e.target.files[0]){arcImport(e.target.files[0]);return;}
   if(id==='fSchool')form.school=e.target.value;
   if(id==='fType'){form.type=e.target.value;form.style=form.type==='B'?'contact':'power';form.throws=THROWS[form.type][0];render();}
   if(id==='fThrows')form.throws=e.target.value;
@@ -1377,6 +1546,7 @@ document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const a=b.dataset.act,v=b.dataset.v;
   if(a!=='reset')confirmReset=false;
+  if(a!=='arcdel')arcDel=null;
   switch(a){
     case 'reset': if(!G){break;} if(confirmReset){G=null;confirmReset=false;try{localStorage.removeItem('kbo-futures-v1');}catch(e){}}else confirmReset=true; break;
     case 'reset2': G=null;try{localStorage.removeItem('kbo-futures-v1');}catch(e){} break;
@@ -1401,6 +1571,14 @@ document.addEventListener('click',e=>{
     case 'ev': applyEvent(v); nextStep(); break;
     case 'train': applyTrain(G.pend[+v]); break;
     case 'clutch': resolveClutch(+v); break;
+    case 'buy': buy(v); break;
+    case 'shopdone': nextStep(); break;
+    case 'arc': VIEW='archive';arcMsg='';break;
+    case 'arcclose': VIEW='game';arcMsg='';break;
+    case 'arcopen': arcOpen=arcOpen===v?null:v; break;
+    case 'arcdel': if(arcDel===v){arcSave(arcLoad().filter(e=>e.id!==v));arcDel=null;arcMsg='삭제했습니다.';}else arcDel=v; break;
+    case 'arcexport': arcExport(); break;
+    case 'arccopy': { const e=arcLoad().find(x=>x.id===v); if(e){try{navigator.clipboard.writeText(arcText(e));arcMsg='요약을 클립보드에 복사했습니다.';}catch(err){arcMsg='복사하지 못했습니다.';}} break; }
     case 'cap': if(v==='yes'){G.captain=true;G.fans+=ri(2000,4000);news(`${team(G.team).n} 주장으로 선임됐다.`,true);G.preSNS=makeSNS(['captain'],snsCtx());}else{G.captainNo=G.year;news('주장 제안을 고사했다.');} nextStep(); break;
     case 'setnum': { const n=parseNum((document.getElementById('jNum')||{}).value); if(n==null){G.numErr='0~99 사이 숫자를 입력하세요.';} else {G.numErr=null; if(n!==G.num){news(`등번호를 ${G.num}번에서 ${n}번으로 바꿨다.`);G.num=n;}} break; }
     case 'cnext': G.cres=null; advanceSeason(); break;

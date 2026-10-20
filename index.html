@@ -481,15 +481,31 @@ const YT={
   retire:['[직캠] {nick} 마지막 경기 기립박수'],legend:['[직캠] 영구결번식 응원석, 다 같이 울었습니다'],ks:['[직캠] 우승 확정 순간 응원석 반응 ㅠㅠ']},
  ch:{off:['KBO 공식'],ana:['덕아웃 분석실','스탯으로 보는 야구','투구 연구소','타격 메커니즘 랩'],opi:['야구 읽어주는 형','불펜 토크','9회말 투아웃','야구 썰 맛집'],fan:['직관러 브이로그','외야석 일기','응원석 직캠러']}};
 function ytViews(n){return n>=1e8?(n/1e8).toFixed(1).replace(/\.0$/,'')+'억회':n>=1e4?(n/1e4).toFixed(n>=1e5?0:1).replace(/\.0$/,'')+'만회':n>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'천회':n+'회';}
+// 스타성(0~1): 유튜브 조회수는 팬 수가 아니라 '진짜 스타인가'로 정한다.
+// 평범한 1군 선수는 수천~수만 회, 초특급 유망주·신인, 잘나가는 프랜차이즈 스타, MVP급만 수십만 회 이상이 나온다
+function starLv(){
+  const one=G.career.filter(r=>r.lvl==='1군'),rec=one.slice(-3),last=rec.length?rec[rec.length-1].s.WAR:0;
+  const avg=rec.length?rec.reduce((a,r)=>a+r.s.WAR,0)/rec.length:0;
+  let s=clamp(Math.max(avg,last*.8)/9,0,.5);                                       // 일반 선수: WAR 4.5가 꾸준해야 .5
+  const d=G.draft;
+  if(G.stage==='hs'&&(G.hsYr||1)>=2&&scoutLv()[0]==='상')s=Math.max(s,.45);          // 고교 랭킹 1위권 유망주
+  if(d&&d.round===1&&d.pick<=3&&one.length<=2)s=Math.max(s,.65);                   // 전체 1~3순위 초특급 유망주
+  if(G.debut&&G.year-G.debut<=1&&last>=4)s=Math.max(s,last>=6?.85:.7);              // 데뷔하자마자 터진 초특급 신인
+  const fr=G.team>=0&&one.length>=5?one.filter(r=>r.team===team(G.team).s):[];
+  if(fr.length>=5&&avg>=4)s=Math.max(s,avg>=6?.9:.75);                            // 잘나가는 프랜차이즈 스타
+  const mvp=G.awards.filter(a=>a.a==='정규시즌 MVP').length;if(mvp)s=Math.max(s,.8+Math.min(mvp,3)*.06);
+  return clamp(s,0,1);
+}
 function makeYT(moods,c,f,hy){
-  const m0=moods[0],B=G.type==='B',out=[];
+  const m0=moods[0],B=G.type==='B',out=[],st=starLv(),cap=st>=.65?Infinity:st>=.45?250000:60000;
   const add=(kind,pool,med,sd,dur)=>{if(!pool||!pool.length)return;const t=fillT(pick(pool),c);if(/\{\w+\}/.test(t)||out.some(v=>v.t===t))return;
-    const v=Math.round(logn(med*Math.pow(10,f*1.1)*hy,sd));out.push({k:kind,t,ch:kind==='fan'&&c.ts&&chance(.4)?`${c.ts} 응원 직캠`:pick(YT.ch[kind]),v,like:Math.round(v*rnd(.008,.03)),dur:`${ri(dur[0],dur[1])}:${String(ri(0,59)).padStart(2,'0')}`});};
+    const tv=kind==='off'&&['ks','legend'].includes(m0);   // 우승 확정·영구결번식은 구단 영상이라 선수 지명도와 무관하게 많이 본다
+    const v=Math.round(Math.min(tv?Infinity:cap,logn((tv?Math.max(med*Math.pow(10,st*2.2),120000):med*Math.pow(10,st*2.2))*hy,sd)));out.push({k:kind,t,ch:kind==='fan'&&c.ts&&chance(.4)?`${c.ts} 응원 직캠`:pick(YT.ch[kind]),v,like:Math.round(v*rnd(.008,.03)),dur:`${ri(dur[0],dur[1])}:${String(ri(0,59)).padStart(2,'0')}`});};
   const offPool=YT.off[m0]||YT.off[moods[1]];
-  if(offPool&&chance(.9))add('off',offPool,25000,.6,[2,12]);
-  if(chance(.55)){const k=(B?c.wrcp!=null:c.fip!=null)&&chance(.4)?(B?'statB':'statP'):(YT.ana[m0]?m0:(B?'B':'P'));add('ana',YT.ana[k],7000,.7,[9,22]);}
-  if(chance(.6))add('opi',YT.opi[m0]||YT.opi[moods[1]],10000,.9,[10,25]);
-  if(out.length<3&&chance(.4))add('fan',YT.fan[m0]||YT.fan.gen,1500,.7,[1,5]);
+  if(offPool&&chance(.9))add('off',offPool,2500,.5,[2,12]);
+  if(chance(.55)){const k=(B?c.wrcp!=null:c.fip!=null)&&chance(.4)?(B?'statB':'statP'):(YT.ana[m0]?m0:(B?'B':'P'));add('ana',YT.ana[k],900,.6,[9,22]);}
+  if(chance(.6))add('opi',YT.opi[m0]||YT.opi[moods[1]],1300,.7,[10,25]);
+  if(out.length<3&&chance(.4))add('fan',YT.fan[m0]||YT.fan.gen,250,.6,[1,5]);
   return out.slice(0,3);
 }
 function makeSNS(moods,c,tags=[]){
@@ -559,7 +575,7 @@ function seasonSNS(L){
   if(L.inj)m.push('injury');
   const cl=(L.clutch||[]).slice().sort((a,b)=>(b.big||0)-(a.big||0))[0];
   if(cl){if(cl.ok)m.unshift('clutchHero');else m.splice(1,0,'clutchFail');}
-  if((L.clutch||[]).some(c=>c.kind==='tb'&&c.pos===4))tags.push(L.ts.rank<=5?'raceWin':'raceLose');
+  if((L.clutch||[]).some(c=>(c.kind==='tb'&&c.pos===4)||(c.kind==='reg'&&c.race==='5위 싸움')))tags.push(L.ts.rank<=5?'raceWin':'raceLose');
   const r=main||L.recs[0],s=r.s,x={stat:keyStat(r),award:aw,rank:L.ts.rank,clutch:cl?cl.short:''};
   if(L.ts.rank<=2)tags.push('teamTop');else if(L.ts.rank>=8)tags.push('teamBottom');
   if(main){
@@ -647,12 +663,24 @@ function parseNum(v){v=String(v??'').trim();if(!/^\d{1,2}$/.test(v))return null;
 function numBox(){return `<div class="numset"><label class="lbl" for="jNum">등번호</label><input id="jNum" type="number" min="0" max="99" inputmode="numeric" value="${G.num}"><button class="btn sec" data-act="setnum" style="padding:7px 12px">변경</button>${G.numErr?`<span class="bad">${esc(G.numErr)}</span>`:'<span class="note">0~99 · 이적하거나 시즌 전에 바꿀 수 있습니다</span>'}</div>`;}
 function news(t,hot){G.news.unshift({y:G.year,t,hot:!!hot});if(G.news.length>160)G.news.length=160;}
 
-const HS_BASE=30;   // 고1 시작 능력치(모든 항목 동일). 20-80 등급에서 55가 1군 주전 평균이라 45로 시작하면 고3에 이미 1군급이 된다
+const HS_BASE=30;   // 고1 시작 '종합' 능력치(화면 45). 세부 능력치는 유형·포지션에 맞게 이 평균 주위로 나뉜다
+// 유형별 시작 능력치 배분(내부 값 기준 편차, 화면에서는 약 1.4배). 합계가 아니라 '종합'이 45가 되도록 나중에 맞춘다
+const START_TILT={
+  contact:{con:5,eye:2,pow:-4,def:-1},slugger:{pow:6,con:-2,spd:-3,def:-1},fivetool:{spd:5,pow:1,eye:-2},glove:{def:6,spd:2,pow:-4},
+  power:{stf:6,ctl:-3,brk:-1},control:{ctl:5,stf:-2},finesse:{brk:5,stf:-2,ctl:1},workhorse:{sta:5,ctl:2,stf:-2}};
+const POS_TILT={'유격수':{def:2,spd:1},'2루수':{def:2,spd:1},'포수':{def:1,spd:-3},'1루수':{pow:2,def:-2},'중견수':{spd:2},'지명타자':{pow:1,def:-3}};
+function startRatings(f,ks){
+  const r={};for(const [k] of ks)r[k]=HS_BASE+(START_TILT[f.style]?.[k]||0)+(f.type==='B'?(POS_TILT[f.pos]?.[k]||0):0)+ri(-1,1);
+  const sh=HS_BASE-overall({type:f.type,pos:f.type==='B'?f.pos:'투수',r});   // 종합 능력치가 정확히 45(화면)가 되도록 전체를 평행이동
+  for(const [k] of ks)r[k]=Math.round((r[k]+sh)*10)/10;
+  return r;
+}
 function newCareer(f){
   const talent=Math.random();f={...f,trait:(x=>x<.2?'genius':x<.45?'grinder':x<.65?'iron':'none')(Math.random())};
-  const r={},pot={};
+  const pot={};
   const ks=f.type==='B'?BAT_KEYS:PIT_KEYS;
-  for(const [k] of ks){r[k]=HS_BASE;pot[k]=ri(37,51)+Math.pow(talent,1.5)*20;}
+  const r=startRatings(f,ks);
+  for(const [k] of ks){pot[k]=ri(37,51)+Math.pow(talent,1.5)*20;}
   // 포지션·유형은 시작 능력치가 아니라 '어디까지 클 수 있나'(잠재력)에 반영
   if(f.type==='B'){
     if(f.pos==='유격수'||f.pos==='2루수'){pot.def+=7;pot.spd+=3;}
@@ -746,7 +774,7 @@ function psRun(){
   const C=G.cur,P=C.ps,T=G.team;
   while(P.s<=3){
     if(!P.cur){P.cur=seriesNew(C,P.s);const mine=P.cur.h===T||P.cur.v===T,key=['주전','선발','마무리'].includes(G.role);
-      P.cur.clutch=mine&&!P.used&&canClutch()&&chance(P.s===3?(key?.75:.45):(key?.4:.2));}
+      P.cur.clutch=mine&&!P.used&&canClutch()&&C.clutch.length<3&&chance(P.s===3?(key?.75:.45):(key?.4:.2));}
     const sr=P.cur;
     while(!seriesDone(sr)){
       if(sr.clutch&&!P.used){const m=myScore(sr);
@@ -813,7 +841,7 @@ function seasonAwards(rec,firstYear){
 function simSeason(){
   const recs=[];
   let inj=0;
-  const injP=.11*(G.trait==='iron'?.34:1)*G.injRisk*((G.owned||[]).includes('recov')?.85:1);
+  const injP=.11*(G.trait==='iron'?.34:1)*G.injRisk*injItems();
   if(chance(injP)){inj=rnd(.12,.55);}
   G.injRisk=1;
   const halves=G.service===1?[['상무',.5],['team',.5]]:[[G.service>0?'상무':'team',1]];
@@ -843,7 +871,7 @@ function playSeason(){
   if(main&&!G.debut)G.debut=G.year;
   const awards=recs.flatMap(r=>{const a=seasonAwards(r,firstYear&&r===main);r.awards=a.filter(x=>x.won).map(x=>x.a);return a;});
   recs.forEach(r=>G.career.push(r));
-  G.cur={recs,inj,war,firstYear:!!firstYear,awards,main:!!main,ord:standings((main?war*.011:0)+(G.captain&&main?.01:0)+(G.campTeam&&main?.008:0)+(G.teamMeal&&main?.004:0)),ps:null,tbDone:{},intl:null,clutch:[],step:'tb'};
+  G.cur={recs,inj,war,firstYear:!!firstYear,awards,main:!!main,ord:standings((main?war*.011:0)+(G.captain&&main?.01:0)+(G.campTeam&&main?.008:0)+(G.teamMeal&&main?.004:0)),ps:null,tbDone:{},intl:null,clutch:[],step:'reg'};
   advanceSeason();
 }
 
@@ -855,11 +883,16 @@ function canClutch(){return G.cur.main&&G.role!=='퓨처스'&&G.role!=='상무';
 function advanceSeason(){
   const C=G.cur,T=G.team;
   for(;;){
+    if(C.step==='reg'){
+      if(C.regN==null){const key=['주전','선발','마무리'].includes(G.role),rk=C.ord.findIndex(x=>x.i===T)+1;
+        C.regN=!canClutch()?0:key?(rk>5&&chance(.4)?3:2):(chance(.65)?1:2);C.regI=0;C.regOpp=[];}
+      if(C.regI<C.regN){C.regI++;setMoment(regMoment(C));return;}
+      C.step='tb';continue;}
     if(C.step==='tb'){
       for(const pos of [0,4]){
         if(C.tbDone[pos])continue;C.tbDone[pos]=true;
         const a=C.ord[pos],b=C.ord[pos+1];if(!sameP(a,b))continue;
-        if((a.i===T||b.i===T)&&canClutch()){const opp=a.i===T?b.i:a.i;
+        if((a.i===T||b.i===T)&&canClutch()&&C.clutch.length<3){const opp=a.i===T?b.i:a.i;
           setMoment({kind:'tb',pos,opp,title:`${G.year} 정규시즌 ${pos?'5위':'1위'} 결정전 (타이브레이커)`,vs:team(opp).n,
             stakes:`승률 ${pctStr(a)} 동률 · ${pos?'이기면 와일드카드 결정전, 지면 시즌 종료':'이기면 정규시즌 1위·한국시리즈 직행, 지면 2위'}`});return;}
         const aw=chance(clamp(.5+(a.v-b.v)*1.6,.2,.8));if(!aw){C.ord[pos]=b;C.ord[pos+1]=a;}
@@ -876,6 +909,22 @@ function advanceSeason(){
       continue;}
     finishSeason();return;
   }
+}
+// 정규시즌 순위 싸움: 1위 경쟁 · 5위(가을야구 마지노선) 싸움 · 하위권이면 상위 팀에 고춧가루
+const ordSort=C=>C.ord.sort((a,b)=>b.w*(a.w+a.l)-a.w*(b.w+b.l));
+function regMoment(C){
+  const T=G.team,o=C.ord,rk=o.findIndex(x=>x.i===T)+1;
+  let race,cand;
+  if(rk<=3){race='1위 경쟁';cand=rk===1?[o[1],o[2]]:[o[0],o[rk===2?2:1]];}
+  else if(rk<=7){race='5위 싸움';cand=rk<=5?[o[5],o[6],o[rk===5?3:4]]:[o[4],o[3],o[rk===6?6:5]];}
+  else{race='고춧가루';cand=o.slice(0,6);}
+  cand=cand.filter(x=>x&&x.i!==T);const fresh=cand.filter(x=>!C.regOpp.includes(x.i));
+  const op=pick(fresh.length?fresh:cand);C.regOpp.push(op.i);
+  const ork=o.findIndex(x=>x.i===op.i)+1,mon=C.regI===C.regN?'9월':C.regI===1?pick(['7월','8월']):'8월';
+  const stakes=race==='1위 경쟁'?`${rk}위 vs ${ork}위 · 정규시즌 1위와 한국시리즈 직행이 걸린 맞대결`
+    :race==='5위 싸움'?`${rk}위 vs ${ork}위 · 가을야구 마지노선 5위를 두고 벌이는 맞대결`
+    :`${rk}위 vs ${ork}위 · 갈 길 바쁜 상위 팀에 고춧가루를 뿌릴 기회`;
+  return {kind:'reg',race,opp:op.i,mon,title:`${G.year} 정규시즌 ${mon} ${team(op.i).s}전`,vs:team(op.i).n,stakes};
 }
 function scene(m){
   const B=G.type==='B',bases=pick(['2루','1·2루','2·3루','만루','1·3루','3루']),outs=pick([0,1,1,2,2,2]);
@@ -898,7 +947,7 @@ function clutchOpts(sc){
        {k:'ctl',n:'코너워크로 맞춰 잡는다',d:'보더라인 제구로 범타를 유도한다',w:{ctl:.8,brk:.2},b:.47,h:.1}];
     if(G.role==='선발')o.push({k:'sta',n:'교체 없이 끝까지 간다',d:'불펜 대신 직접 위기를 막는다',w:{sta:.5,stf:.5},b:.4,h:.25});
   }
-  const exp=clamp(((G.clutchW||0)-(G.clutchL||0))*.01,-.04,.06)+(G.captain?.03:0);
+  const exp=clamp(((G.clutchW||0)-(G.clutchL||0))*.01,-.04,.06)+(G.captain?.03:0)+(G.mental?.04:0);
   return o.map(x=>{const r=Object.entries(x.w).reduce((a,[k,v])=>a+G.r[k]*v,0);
     return {...x,p:clamp(x.b+(r-55)*.014+exp,.1,.9),key:Object.keys(x.w).map(KN).join('·')};});
 }
@@ -920,6 +969,12 @@ function resolveClutch(idx){
     const a=C.ord[m.pos],b=C.ord[m.pos+1],me=a.i===T?a:b,op=a.i===T?b:a;
     C.ord[m.pos]=ok?me:op;C.ord[m.pos+1]=ok?op:me;
     after=m.pos?(ok?'5위 결정전 승리! 와일드카드 결정전에 나간다.':'5위 결정전 패배. 6위로 시즌을 마쳤다.'):(ok?'1위 결정전 승리! 정규시즌 우승, 한국시리즈 직행.':'1위 결정전 패배. 2위로 플레이오프를 기다린다.');big=m.pos?1.5:2;
+  }else if(m.kind==='reg'){
+    const me=C.ord.find(x=>x.i===T),op=C.ord.find(x=>x.i===m.opp),before=C.ord.indexOf(me)+1,sw=ok?(hero?2:1):-1;
+    // 승부처 결과가 그 3연전 승패를 바꾼다: 성공 1경기, 영웅이면 스윕(2경기), 실패면 1경기를 상대에게 내준다
+    me.w+=sw;me.l-=sw;op.w-=sw;op.l+=sw;ordSort(C);const now=C.ord.indexOf(me)+1;
+    after=`${hero?'기세를 탄 팀이 3연전을 쓸어 담았다. ':ok?'이 경기를 잡았다. ':'이 경기를 내줬다. '}${team(T).s} ${before===now?`${now}위 유지`:`${before}위 → ${now}위`} (${me.w}승 ${me.l}패${me.d?` ${me.d}무`:''})`;
+    big=m.race==='고춧가루'?.8:m.race==='1위 경쟁'?1.4:1.2;
   }else if(m.kind==='post'){
     const sr=C.ps.cur;seriesGame(C,sr,(sr.h===T)===ok);const ended=seriesDone(sr);
     while(!seriesDone(sr))seriesGame(C,sr);
@@ -937,8 +992,8 @@ function resolveClutch(idx){
   const t=pick(CL_TXT[o.k][hero?'hero':ok?'ok':'fail']);
   if(ok)G.clutchW=(G.clutchW||0)+1;else G.clutchL=(G.clutchL||0)+1;
   G.fans+=ok?Math.round(ri(800,2000)*big*(hero?1.8:1)):ri(100,400);
-  const short=m.kind==='tb'?`${m.pos?'5위':'1위'} 결정전`:m.kind==='post'?`${PS_STAGE[m.s]} ${m.gn}차전`:`${m.ev} ${INTL_GAME[m.k]}`;
-  C.clutch.push({kind:m.kind,pos:m.pos,ok,hero,big,short,title:m.title,choice:o.n,txt:t,after});
+  const short=m.kind==='reg'?`${m.mon} ${team(m.opp).s}전 (${m.race})`:m.kind==='tb'?`${m.pos?'5위':'1위'} 결정전`:m.kind==='post'?`${PS_STAGE[m.s]} ${m.gn}차전`:`${m.ev} ${INTL_GAME[m.k]}`;
+  C.clutch.push({kind:m.kind,pos:m.pos,race:m.race,ok,hero,big,short,title:m.title,choice:o.n,txt:t,after});
   news(`${short} 승부처, 「${o.n}」 → ${tier}. ${after}`,ok);
   G.cres={title:m.title,vs:m.vs,choice:o.n,tier,txt:t,after};G.moment=null;G.phase='cres';
 }
@@ -973,7 +1028,7 @@ function finishSeason(){
     else G.salary=Math.max(.3,G.salary*.92);
   }
   G.cash=Math.round(((G.cash||0)+G.salary*.6)*100)/100;   // 세금·생활비를 빼고 연봉의 약 60%가 쌓인다
-  G.campTeam=false;G.teamMeal=false;
+  G.campTeam=false;G.teamMeal=false;G.mental=false;
   if(G.contract){G.contract.left--;}
   if(G.service>0){G.service--;if(G.service===0){G.served=true;news('상무 복무를 마치고 전역했다.',true);}}
   G.lastWAR=main?war:-0.5;
@@ -1040,7 +1095,7 @@ function nextStep(){
   if(s==='train'){const pool=(G.type==='B'?BAT_TRAIN:PIT_TRAIN).slice();G.pend=[];while(G.pend.length<3){const i=ri(0,pool.length-1);G.pend.push(pool.splice(i,1)[0]);}}
   if(s==='fa')G.pend=makeOffers();
   if(s==='meet')G.pend=meetOptions();
-  if(s==='shop'){G.shopBought=[];G.wb=null;}
+  if(s==='shop'){G.shopBought=[];G.wb=null;G.shopOffer=rollShop();}
 }
 function makeOffers(){
   const recent=G.career.filter(c=>c.lvl==='1군').slice(-3);
@@ -1220,31 +1275,72 @@ function similarPlayers(){
 function simVerdict(s){return s>=950?'거의 판박이':s>=900?'매우 비슷':s>=800?'꽤 비슷':s>=650?'어느 정도 닮음':'굳이 꼽자면';}
 const simBest=sim=>sim?(sim.best||(sim.cum&&sim.cum[0])):null;
 // 상점: 연봉의 일부(세금·생활비 빼고 약 60%)가 쌓인 자금으로 겨울마다 장비와 사설 훈련을 산다
+// 상점: 오프시즌마다 아래 목록에서 무작위로 5개만 진열된다. 장비는 한 번 사면 영구 효과이고, 상위 장비는 커리어가 쌓이면 새로 풀린다
+const ONE=()=>G.oneGun||0;
 const SHOP=[
  {id:'bat',cat:'장비',t:'B',n:'맞춤 제작 배트 세트',p:.15,d:'컨택 ▲ · 파워 ▲ (영구)',eff:{con:1,pow:1}},
+ {id:'bat2',cat:'장비',t:'B',n:'해외 브랜드 프로 모델 배트',p:.45,d:'컨택 ▲ · 파워 ▲ (영구) · 맞춤 배트의 상위 장비',eff:{con:1,pow:1},need:'bat',req:()=>ONE()>=2,why:'1군 2시즌 이상'},
+ {id:'bat3',cat:'장비',t:'B',n:'내 이름을 건 시그니처 배트',p:1.2,d:'파워 ▲▲ · 컨택 ▲ (영구) · 팬 ▲',eff:{pow:2,con:1},fans:3000,need:'bat2',req:()=>ONE()>=5&&G.lastWAR>=3,why:'1군 5시즌 · 직전 시즌 WAR 3 이상'},
  {id:'glove',cat:'장비',t:'B',n:'수제 글러브',p:.1,d:'수비 ▲▲ (영구)',eff:{def:2}},
+ {id:'glove2',cat:'장비',t:'B',n:'장인 주문 제작 글러브',p:.35,d:'수비 ▲▲ (영구) · 수제 글러브의 상위 장비',eff:{def:2},need:'glove',req:()=>ONE()>=2,why:'1군 2시즌 이상'},
  {id:'spike',cat:'장비',t:'B',n:'경량 스파이크',p:.08,d:'주루 ▲ (영구)',eff:{spd:1}},
+ {id:'insole',cat:'장비',t:'B',n:'족형 맞춤 인솔·스파이크',p:.3,d:'주루 ▲ (영구) · 하체 부상 확률 5% ▼',eff:{spd:1},inj:.95,need:'spike',req:()=>ONE()>=1,why:'1군 1시즌 이상'},
+ {id:'sensor',cat:'장비',t:'B',n:'스윙 분석 센서',p:.25,d:'컨택 ▲ · 선구 ▲ (영구)',eff:{con:1,eye:1},req:()=>G.year>=2028,why:'2028년 출시 예정'},
+ {id:'vision',cat:'장비',t:'B',n:'VR 비전 트레이닝 장비',p:.7,d:'선구 ▲▲ (영구)',eff:{eye:2},req:()=>G.year>=2031,why:'2031년 출시 예정'},
  {id:'pglove',cat:'장비',t:'P',n:'투수용 맞춤 글러브',p:.1,d:'제구 ▲ (영구)',eff:{ctl:1}},
+ {id:'pglove2',cat:'장비',t:'P',n:'장인 주문 제작 투수 글러브',p:.35,d:'제구 ▲ (영구) · 맞춤 글러브의 상위 장비',eff:{ctl:1},need:'pglove',req:()=>ONE()>=2,why:'1군 2시즌 이상'},
+ {id:'wball',cat:'장비',t:'P',n:'웨이티드볼·플라이오볼 세트',p:.06,d:'구위 ▲ (영구)',eff:{stf:1}},
  {id:'tracker',cat:'장비',t:'P',n:'개인 투구 추적 장비',p:.3,d:'변화구 ▲ · 제구 ▲ (영구)',eff:{brk:1,ctl:1}},
- {id:'recov',cat:'장비',n:'회복 장비 세트 (냉각·압박)',p:.25,d:'부상 확률 15% ▼ (영구)'},
+ {id:'lab',cat:'장비',t:'P',n:'초고속 카메라 개인 피칭 랩',p:1.5,d:'변화구 ▲▲ · 구위 ▲ (영구) · 투구 추적 장비의 상위 장비',eff:{brk:2,stf:1},need:'tracker',req:()=>ONE()>=4,why:'1군 4시즌 이상'},
+ {id:'band',cat:'장비',t:'P',n:'어깨·팔꿈치 관리 밴드 세트',p:.03,d:'체력 ▲ (영구) · 팔 부상 확률 5% ▼',eff:{sta:1},inj:.95},
+ {id:'recov',cat:'장비',n:'회복 장비 세트 (냉각·압박)',p:.25,d:'부상 확률 15% ▼ (영구)',inj:.85},
+ {id:'recov2',cat:'장비',n:'자택 고압 산소 캡슐',p:1.5,d:'부상 확률 추가 15% ▼ (영구) · 회복 장비의 상위 장비',inj:.85,need:'recov',req:()=>ONE()>=3,why:'1군 3시즌 이상'},
+ {id:'bed',cat:'장비',n:'수면 관리 매트리스·스마트 링',p:.12,d:'부상 확률 5% ▼ (영구)',inj:.95,req:()=>G.year>=2029,why:'2029년 출시 예정'},
  {id:'eel',cat:'보양식',n:'풍천장어 보양식 코스',p:.03,d:'기력 회복 · 다음 시즌 부상 위험 15% ▼'},
  {id:'samgye',cat:'보양식',n:'단골집 삼계탕 한 그릇',p:.0002,d:'든든하다 · 다음 시즌 부상 위험 5% ▼'},
  {id:'ginseng',cat:'보양식',n:'홍삼·영양제 1년치',p:.02,d:'체력 관리 · 투수는 체력 ▲, 타자는 주루 ▲'},
+ {id:'herb',cat:'보양식',n:'한의원 보약 한 재',p:.06,d:'몸이 가볍다 · 다음 시즌 부상 위험 10% ▼'},
  {id:'momfood',cat:'보양식',n:'본가에서 어머니 집밥 한 달',p:0,d:'무료 · 마음이 편해져 이번 겨울 슬럼프 확률이 크게 준다'},
  {id:'hanwoo',cat:'보양식',n:'동료들에게 한우 회식 쏘기',p:.05,d:'팀 분위기 ▲ (다음 시즌 팀 전력 소폭 ▲) · 팬 ▲'},
  {id:'gourmet',cat:'보양식',n:'유명 맛집 투어',p:.03,d:'맛있는 음식으로 기분 최고 · 먹방 인증으로 팬 ▲'},
  {id:'pt',cat:'관리',n:'개인 트레이너 PT·필라테스',p:.2,d:'다음 시즌 부상 위험 30% ▼'},
+ {id:'massage',cat:'관리',n:'스포츠 마사지·도수치료 패키지',p:.06,d:'다음 시즌 부상 위험 15% ▼'},
+ {id:'mental',cat:'관리',n:'스포츠 심리 상담',p:.1,d:'다음 시즌 승부처 성공 확률 +4%p'},
+ {id:'trip',cat:'관리',n:'가족과 따뜻한 나라로 휴가',p:.3,d:'완전한 휴식 · 슬럼프 확률 크게 ▼ · 부상 위험 10% ▼'},
  {id:'academy',cat:'캠프',n:'사설 아카데미 개인 레슨',p:.4,d:'이번 겨울 훈련 효과 ×1.3 · 대박 확률 +3%p',mul:1.3,big:.03},
  {id:'usa',cat:'캠프',n:'미국 사설 트레이닝 센터 연수',p:1.2,d:'훈련 효과 ×1.5 · 대박 확률 +8%p',mul:1.5,big:.08},
+ {id:'japan',cat:'캠프',n:'일본 독립리그 출신 코치 원포인트 레슨',p:.25,d:'훈련 효과 ×1.2 · 대박 확률 +2%p',mul:1.2,big:.02},
  {id:'juniors',cat:'캠프',n:'후배들 데리고 사비 해외 전지훈련',p:2.5,d:'훈련 효과 ×1.3 · 다음 시즌 팀 전력 ▲ · 팬 ▲ · 영구결번 지수 가산',mul:1.3,big:.04,
    req:()=>G.age>=29&&G.oneGun>=5,why:'1군 5시즌·만 29세 이상 베테랑만'},
- {id:'donate',cat:'기부',n:'모교 야구부 장비 기부',p:.5,d:'팬 ▲ · 모교에 이름을 남긴다'}];
-const SHOP_CAT={장비:'장비 (한 번 사면 계속 효과)',보양식:'보양식·맛있는 음식',관리:'몸 관리',캠프:'겨울 개인 훈련',기부:'기부'};
+ {id:'donate',cat:'기부',n:'모교 야구부 장비 기부',p:.5,d:'팬 ▲ · 모교에 이름을 남긴다'},
+ {id:'fanmeet',cat:'기부',n:'사비로 팬미팅 열기',p:.15,d:'팬 ▲ · 팬카페 분위기 최고',req:()=>ONE()>=1,why:'1군 1시즌 이상'},
+ {id:'child',cat:'기부',n:'소아병동 위문·기부',p:.3,d:'팬 ▲ · 훈훈한 기사'}];
+const SHOP_N=5;
+const SHOP_CAT={장비:'장비 (한 번 사면 계속 효과)',보양식:'보양식·맛있는 음식',관리:'몸 관리',캠프:'겨울 개인 훈련',기부:'기부·팬서비스'};
 const JUNIOR_SPOT=['사이판','괌','오키나와','호주 시드니'];
+// 진열될 수 있는 물건인가(조건이 아예 안 맞거나 이미 가진 장비는 진열하지 않는다)
+function shopAvail(it){
+  if(it.t&&it.t!==G.type)return false;
+  const own=G.owned||[];
+  if(it.cat==='장비'&&own.includes(it.id))return false;
+  if(it.need&&!own.includes(it.need))return false;
+  if(it.req&&!it.req())return false;
+  if(it.id==='donate'&&G.lastDonate&&G.year-G.lastDonate<3)return false;
+  return true;
+}
+function rollShop(){
+  const pool=SHOP.filter(shopAvail),cash=G.cash||0,out=[];
+  const take=f=>{const c=pool.filter(it=>f(it)&&!out.includes(it));if(c.length)out.push(pick(c));};
+  take(it=>it.need);                                    // 새로 풀린 상위 장비가 있으면 우선 한 자리
+  take(it=>it.cat==='장비');                              // 장비 한 자리
+  take(it=>it.p<=cash&&it.cat!=='장비');                  // 지금 살 수 있는 소모품 한 자리
+  while(out.length<SHOP_N){const c=pool.filter(it=>!out.includes(it));if(!c.length)break;out.push(pick(c));}
+  return shuffle(out).map(it=>it.id);
+}
 function shopState(it){
   if(it.t&&it.t!==G.type)return 'hide';
   const own=(G.owned||[]).includes(it.id),bought=(G.shopBought||[]);
-  if(it.cat==='장비'&&own)return 'own';
+  if(it.cat==='장비'&&own&&!bought.includes(it.id))return 'own';
   if(bought.includes(it.id))return 'done';
   if(bought.length)return 'other';   // 오프시즌마다 딱 하나
   if(it.req&&!it.req())return 'lock';
@@ -1252,10 +1348,11 @@ function shopState(it){
   if((G.cash||0)<it.p)return 'poor';
   return 'ok';
 }
+function injItems(){return (G.owned||[]).reduce((m,id)=>m*((SHOP.find(x=>x.id===id)||{}).inj||1),1);}
 function buy(id){
-  const it=SHOP.find(x=>x.id===id);if(!it||shopState(it)!=='ok')return;
+  const it=SHOP.find(x=>x.id===id);if(!it||shopState(it)!=='ok'||!(G.shopOffer||[]).includes(id))return;
   G.cash=Math.round((G.cash-it.p)*100)/100;(G.shopBought=G.shopBought||[]).push(id);
-  if(it.cat==='장비'){(G.owned=G.owned||[]).push(id);if(it.eff)for(const k in it.eff)G.r[k]=clamp(G.r[k]+it.eff[k],20,85);news(`${it.n} 구입 (${won(it.p)}).`);}
+  if(it.cat==='장비'){(G.owned=G.owned||[]).push(id);if(it.eff)for(const k in it.eff)G.r[k]=clamp(G.r[k]+it.eff[k],20,85);if(it.fans)G.fans+=it.fans;news(`${it.n} 구입 (${won(it.p)}).`,!!it.need);}
   if(id==='pt'){G.injRisk*=.7;news('개인 트레이너와 겨울 내내 몸을 관리했다.');}
   if(it.cat==='캠프'){G.wb={mul:it.mul,big:it.big,n:it.n};
     if(id==='juniors'){const sp=pick(JUNIOR_SPOT);G.campTeam=true;G.juniorCamps=(G.juniorCamps||0)+1;G.fans+=ri(3000,7000);
@@ -1263,11 +1360,17 @@ function buy(id){
     else news(`${it.n} 등록 (${won(it.p)}).`);}
   if(id==='eel'){G.injRisk*=.85;news('풍천장어로 겨울 기력을 보충했다.');}
   if(id==='samgye'){G.injRisk*=.95;news('단골집 삼계탕 한 그릇으로 몸을 데웠다.');}
+  if(id==='herb'){G.injRisk*=.9;news('한의원에서 보약 한 재를 지어 먹었다.');}
   if(id==='ginseng'){const k=G.type==='P'?'sta':'spd';G.r[k]=clamp(G.r[k]+1,20,85);news('홍삼과 영양제를 꼬박꼬박 챙겼다.');}
   if(id==='momfood'){G.calm=true;news('겨울 한 달을 본가에서 어머니 집밥을 먹으며 보냈다.');}
   if(id==='hanwoo'){G.teamMeal=true;G.fans+=ri(500,1500);news(`동료들에게 한우 회식을 쐈다. 더그아웃 분위기가 좋아졌다.`,true);}
   if(id==='gourmet'){G.fans+=ri(800,2500);news('맛집 투어 먹방 인증샷이 화제가 됐다.');}
+  if(id==='massage'){G.injRisk*=.85;news('겨울 내내 마사지와 도수치료로 몸을 풀었다.');}
+  if(id==='mental'){G.mental=true;news('스포츠 심리 상담을 받으며 큰 경기에 대비했다.');}
+  if(id==='trip'){G.calm=true;G.injRisk*=.9;news('가족과 따뜻한 나라에서 푹 쉬고 왔다.');}
   if(id==='donate'){G.lastDonate=G.year;G.fans+=ri(3000,6000);news(`모교 ${G.school} 야구부에 장비를 기부했다.`,true);}
+  if(id==='fanmeet'){G.fans+=ri(1500,4000);news('사비로 팬미팅을 열었다. 팬카페가 들썩였다.',true);}
+  if(id==='child'){G.fans+=ri(1500,3500);news('소아병동을 찾아 아이들과 캐치볼을 하고 기부금을 전달했다.',true);}
 }
 // GAME END
 
@@ -1288,7 +1391,7 @@ const THROWS={B:['우투우타','우투좌타','좌투좌타','우투양타'],P:
 let confirmReset=false;
 
 function playerCard(){
-  if(!G)return `<aside class="card pcard"><div class="lbl">스카우팅 리포트</div><p class="note">선수를 만들면 이곳에 능력치가 표시됩니다. 모두 45에서 시작하고, 80이 1군 주전 평균, 90이면 KBO 레전드급입니다.</p></aside>`;
+  if(!G)return `<aside class="card pcard"><div class="lbl">스카우팅 리포트</div><p class="note">선수를 만들면 이곳에 능력치가 표시됩니다. 종합 45에서 시작하고(세부 능력치는 유형에 맞게 높고 낮음이 있습니다), 80이 1군 주전 평균, 90이면 KBO 레전드급입니다.</p></aside>`;
   const ks=keys();
   const ov=overall();
   const mil=G.exempt?'병역 면제':G.served?'군필':G.service>0?'상무 복무 중':'미필';
@@ -1426,14 +1529,15 @@ function phasePanel(){
       <p class="rv" style="--i:5">${esc(t.txt)}</p>
       <div class="callout rv" style="--i:6"><b>${esc(t.after)}</b></div>
       <div class="rv" style="--i:7"><button class="btn" data-act="cnext">계속</button></div></section>`;}
-  if(P==='shop'){const cats=Object.keys(SHOP_CAT);
+  if(P==='shop'){if(!G.shopOffer)G.shopOffer=rollShop();
+    const items=G.shopOffer.map(id=>SHOP.find(x=>x.id===id)).filter(Boolean);
     return `<section class="card stack fade"><div class="lbl">오프시즌 · 상점</div><h2>보유 자금 ${won(G.cash||0)}</h2>
-      <p class="note"><b>오프시즌마다 딱 하나만</b> 고를 수 있습니다. 연봉에서 세금·생활비를 빼고 약 60%가 자금으로 쌓이고, 겨울 개인 훈련은 이어지는 스프링캠프 훈련 결과에 바로 반영됩니다.</p>
-      ${cats.map(c=>{const items=SHOP.filter(it=>it.cat===c&&shopState(it)!=='hide');if(!items.length)return '';
-        return `<div class="lbl">${SHOP_CAT[c]}</div><div class="opts">${items.map(it=>{const st=shopState(it);
+      <p class="note">이번 겨울 진열된 물건은 <b>${items.length}개</b>, 그중 <b>딱 하나만</b> 고를 수 있습니다. 진열은 겨울마다 바뀌고, 커리어가 쌓이면 상위 장비와 새 물건이 풀립니다. 연봉에서 세금·생활비를 빼고 약 60%가 자금으로 쌓이고, 겨울 개인 훈련은 이어지는 스프링캠프 훈련 결과에 바로 반영됩니다.</p>
+      <div class="opts">${items.map(it=>{const st=shopState(it);
           const tag={own:'보유 중',done:'구매 완료',other:'이번 겨울엔 이미 골랐음',lock:it.why||'조건 미달',wait:'3년에 한 번',poor:'자금 부족',ok:it.p?won(it.p):'무료'}[st];
-          return `<button class="opt ${st==='done'||st==='own'?'on':''}" data-act="buy" data-v="${it.id}" ${st==='ok'?'':'disabled aria-disabled="true"'}><b>${esc(it.n)}</b><span>${esc(it.d)}</span><span class="vol ${st==='ok'?'v-안정':st==='done'||st==='own'?'v-보통':'v-도박'}">${st==='ok'?'':(it.p?won(it.p):'무료')+' · '}${esc(tag)}</span></button>`;}).join('')}</div>`;}).join('')}
-      <div><button class="btn" data-act="shopdone">스프링캠프로</button></div></section>`;}
+          return `<button class="opt ${st==='done'||st==='own'?'on':''}" data-act="buy" data-v="${it.id}" ${st==='ok'?'':'disabled aria-disabled="true"'}><span class="note">${esc(it.cat)}${it.need?' · 신규 입고':''}</span><b>${esc(it.n)}</b><span>${esc(it.d)}</span><span class="vol ${st==='ok'?'v-안정':st==='done'||st==='own'?'v-보통':'v-도박'}">${st==='ok'?'':(it.p?won(it.p):'무료')+' · '}${esc(tag)}</span></button>`;}).join('')}</div>
+      ${(G.owned||[]).length?`<p class="note">보유 장비: ${G.owned.map(id=>(SHOP.find(x=>x.id===id)||{}).n).filter(Boolean).map(esc).join(' · ')}</p>`:''}
+      <div><button class="btn" data-act="shopdone">${(G.shopBought||[]).length?'스프링캠프로':'아무것도 사지 않고 스프링캠프로'}</button></div></section>`;}
   if(P==='captain')return `<section class="card stack fade"><div class="lbl">오프시즌 · 선수단 투표</div><h2>${esc(team(G.team).s)}의 새 주장으로 추천됐다</h2>
       <p>감독과 선수단이 다음 시즌 주장 완장을 맡아달라고 한다. 더그아웃의 중심이 되면 팀 분위기와 큰 경기 집중력이 올라가지만, 후배들을 챙기느라 개인 훈련 시간은 줄어든다.</p>
       <div class="opts"><button class="opt" data-act="cap" data-v="yes"><b>주장 완장을 찬다</b><span>팀 전력 소폭 ▲ · 승부처 성공 확률 +3%p · 팬 ▲ · 영구결번 지수 가산</span><span class="vol v-보통">겨울 훈련 효과 15% ▼ · 팀 성적이 나쁘면 비판도 함께</span></button>
@@ -1500,7 +1604,7 @@ function endPanel(){
 function newForm(){
   const posOpts=[...POSITIONS,'지명타자'];
   return `<section class="card stack fade"><div class="lbl">새 커리어</div><h2>고교 1학년, 프로를 꿈꾸는 신입생</h2>
-    <p>모든 능력치 45에서 시작해 고교 3년을 직접 키운 뒤 KBO 신인드래프트에 나갑니다. 겨울 훈련과 고교 시절 선택이 지명 순위를 가릅니다. 프로로 직행할지, 대학에서 4년을 더 다듬을지는 드래프트 결과를 보고 정합니다. 퓨처스리그에서 시작해 1군 주전, 국가대표, FA 대박, 영구결번까지 커리어를 만들어 보세요.</p>
+    <p>종합 능력치 45에서 시작해(고른 유형에 맞게 강점과 약점이 나뉩니다) 고교 3년을 직접 키운 뒤 KBO 신인드래프트에 나갑니다. 겨울 훈련과 고교 시절 선택이 지명 순위를 가릅니다. 프로로 직행할지, 대학에서 4년을 더 다듬을지는 드래프트 결과를 보고 정합니다. 퓨처스리그에서 시작해 1군 주전, 국가대표, FA 대박, 영구결번까지 커리어를 만들어 보세요.</p>
     <div class="form">
       <div class="field"><label class="lbl" for="fName">이름</label><input id="fName" maxlength="8" value="${esc(form.name)}" placeholder="예: 김도윤"></div>
       <div class="field"><label class="lbl" for="fNum">등번호</label><input id="fNum" type="number" min="0" max="99" inputmode="numeric" value="${esc(form.num)}" placeholder="0~99 · 비우면 자동"></div>
